@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>풍향풍속 도해 · 서울 · 1926년 기상도 풍 빈티지 차트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --paper: #f5efe6;
+    --paper-2: #ede4d3;
+    --ink: #2a2419;
+    --ink-soft: #4a3f30;
+    --ink-faint: #7a6c54;
+    --ink-mute: #a3937a;
+    --rule: #c9b89a;
+    --rule-soft: #ddd0b8;
+    --accent-red: #9b2226;
+    --accent-blue: #1d4e6f;
+    --accent-teal: #4f6d6a;
+    --accent-amber: #b67730;
+    --accent-deep: #5a3a1f;
+    --font-serif-en: "Cormorant Garamond", "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+    --font-serif-ko: "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+    --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-serif-ko);
+    font-feature-settings: "tnum";
+  }
+
+  /* 종이 질감 */
+  body {
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(180, 145, 90, 0.05) 0%, transparent 60%),
+      radial-gradient(circle at 80% 90%, rgba(120, 80, 30, 0.06) 0%, transparent 60%),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 2px,
+        rgba(165, 130, 75, 0.025) 2px,
+        rgba(165, 130, 75, 0.025) 3px
+      ),
+      linear-gradient(180deg, #f7f1e7 0%, #efe6d2 100%);
+    background-attachment: fixed;
+  }
+  /* 종이 가장자리 황변 비네트 */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at center, transparent 50%, rgba(120, 80, 30, 0.18) 100%),
+      radial-gradient(circle at 5% 5%, rgba(120, 80, 30, 0.18), transparent 30%),
+      radial-gradient(circle at 95% 95%, rgba(120, 80, 30, 0.16), transparent 30%);
+    z-index: 0;
+  }
+  main, header { position: relative; z-index: 1; }
+
+  .font-en { font-family: var(--font-serif-en); }
+  .font-ko { font-family: var(--font-serif-ko); }
+  .ink { color: var(--ink); }
+  .ink-soft { color: var(--ink-soft); }
+  .ink-faint { color: var(--ink-faint); }
+  .ink-mute { color: var(--ink-mute); }
+
+  /* 이중 외곽 테두리 */
+  .frame {
+    border: 1.5px solid var(--ink);
+    box-shadow:
+      inset 0 0 0 4px var(--paper),
+      inset 0 0 0 5px var(--ink),
+      0 0 0 1px rgba(154, 122, 76, 0.15);
+  }
+  .rule { border-color: var(--rule); }
+  .rule-strong { border-color: var(--ink-soft); }
+
+  /* 장식 라인 (이탤릭 캡션 위 아래) */
+  .ornament {
+    display: flex; align-items: center; gap: 0.75rem;
+    color: var(--ink-faint);
+    font-family: var(--font-serif-en);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+  .ornament::before, .ornament::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* 도장 */
+  .stamp {
+    transform: rotate(-8deg);
+    border: 2.5px solid var(--accent-red);
+    color: var(--accent-red);
+    padding: 0.5rem 0.9rem;
+    font-family: var(--font-serif-en);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    border-radius: 6px;
+    opacity: 0.85;
+    background: rgba(255, 250, 240, 0.5);
+    text-shadow: 0 0 0.5px rgba(155, 34, 38, 0.4);
+  }
+
+  /* 메트릭 셀 빈티지 */
+  .metric {
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(180deg, rgba(255,250,240,0.6), rgba(245, 235, 215, 0.3));
+  }
+  .metric-label {
+    font-family: var(--font-serif-en);
+    font-style: italic;
+    letter-spacing: 0.05em;
+    color: var(--ink-faint);
+  }
+
+  /* 풍속 sparkline 라벨 */
+  .axis-label { font-family: var(--font-serif-en); font-size: 9px; fill: var(--ink-faint); }
+
+  /* 보퍼트 표 */
+  .beaufort-tbl th, .beaufort-tbl td {
+    border: 1px solid var(--rule);
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .beaufort-tbl th {
+    background: rgba(212, 188, 145, 0.18);
+    font-family: var(--font-serif-en);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  .beaufort-tbl tr.active td {
+    background: rgba(155, 34, 38, 0.08);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* 16방위 라벨 */
+  .compass-label {
+    font-family: var(--font-serif-en);
+    font-weight: 600;
+    fill: var(--ink);
+  }
+  .compass-label-sub { fill: var(--ink-faint); font-size: 9px; }
+
+  /* 풍속 화살표 펄스 (active 방향) */
+  @keyframes vane-glow {
+    0%, 100% { opacity: 0.92; }
+    50%      { opacity: 0.7; }
+  }
+  .vane-active { animation: vane-glow 2.4s ease-in-out infinite; }
+
+  *:focus-visible {
+    outline: 2px solid var(--accent-red);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main class="max-w-6xl mx-auto p-4 md:p-8">
+
+  <!-- 메인 종이 프레임 -->
+  <div class="frame bg-[var(--paper)]/40 rounded-sm p-5 md:p-10">
+
+    <!-- 헤더 -->
+    <header class="text-center pb-5 border-b border-[var(--rule)]">
+      <p class="font-en italic text-sm tracking-[0.4em] ink-mute">— ESTABLISHED · MCMXXVI —</p>
+      <h1 class="font-en text-3xl md:text-5xl font-bold tracking-wider mt-2 ink">
+        WIND CHART
+      </h1>
+      <p class="font-ko text-base md:text-lg mt-1 ink-soft">풍향 풍속 도해 · 서울 관측소</p>
+      <div class="ornament mt-3 max-w-md mx-auto">
+        <span>Anno Domini 2026 · Mensis Maii Sextus</span>
+      </div>
+      <div class="mt-3 flex items-center justify-center gap-6 text-xs ink-faint font-en italic">
+        <span>OBSERVED · 15:24 KST</span>
+        <span>·</span>
+        <span>LAT 37.57° N · LON 126.98° E</span>
+        <span>·</span>
+        <span>ELEV 86 m</span>
+      </div>
+    </header>
+
+    <!-- 본문 그리드 -->
+    <section class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-12 mt-6 md:mt-8">
+
+      <!-- 좌: 윈드로즈 -->
+      <article class="relative">
+        <div class="ornament mb-3">
+          <span>Plate I — Compass Rose, 16 Points</span>
+        </div>
+
+        <!-- 도장 (좌상) -->
+        <div class="absolute -top-2 -left-2 stamp text-[10px] hidden md:block" aria-hidden="true">
+          KMA<br/>OBS · 108
+        </div>
+
+        <div class="relative bg-[var(--paper)]/60 rounded-sm border border-[var(--rule)] p-4 md:p-6">
+          <svg viewBox="0 0 420 420" class="w-full h-auto" role="img"
+               aria-label="16방위 윈드로즈 차트, 현재 풍향 남서, 풍속 4.2 미터퍼초, 가장 빈도 높은 방향 남서 15퍼센트">
+            <title>윈드로즈 · 서울 · 16방위 풍향 빈도 분포</title>
+            <desc>현재 풍향 남서(SW), 풍속 4.2 m/s, 돌풍 6.8 m/s. 가장 빈도 높은 방향 남서 15%.</desc>
+
+            <defs>
+              <radialGradient id="paper-fade" cx="0.5" cy="0.5" r="0.6">
+                <stop offset="0%"  stop-color="#fffaf0" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#e6d6b0" stop-opacity="0"/>
+              </radialGradient>
+              <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#9b2226" stroke-width="1" opacity="0.45"/>
+              </pattern>
+              <pattern id="hatch-soft" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#1d4e6f" stroke-width="0.7" opacity="0.35"/>
+              </pattern>
+            </defs>
+
+            <!-- 페이드 배경 -->
+            <circle cx="210" cy="210" r="180" fill="url(#paper-fade)"/>
+
+            <!-- 외곽 이중 원 -->
+            <circle cx="210" cy="210" r="180" fill="none" stroke="#2a2419" stroke-width="1.5"/>
+            <circle cx="210" cy="210" r="173" fill="none" stroke="#2a2419" stroke-width="0.5"/>
+
+            <!-- 빈도 동심원 (5/10/15%) -->
+            <g fill="none" stroke="#a08760" stroke-width="0.7" stroke-dasharray="2 4">
+              <circle cx="210" cy="210" r="55"/>
+              <circle cx="210" cy="210" r="110"/>
+              <circle cx="210" cy="210" r="165"/>
+            </g>
+            <!-- 빈도 라벨 (북쪽 축 부근) -->
+            <g class="axis-label" font-family="Cormorant Garamond, serif" font-size="9" fill="#7a6c54">
+              <text x="214" y="158">5%</text>
+              <text x="214" y="103">10%</text>
+              <text x="214" y="48">15%</text>
+            </g>
+
+            <!-- 16 보조 방위선 -->
+            <g stroke="#c9b89a" stroke-width="0.5" id="bearing-lines"></g>
+
+            <!-- 4 주방위선 (강조) -->
+            <g stroke="#5a3a1f" stroke-width="1">
+              <line x1="210" y1="30"  x2="210" y2="390"/>
+              <line x1="30"  y1="210" x2="390" y2="210"/>
+            </g>
+
+            <!-- 16 풍향 부채꼴 -->
+            <g id="wind-sectors"></g>
+
+            <!-- 16방위 라벨 -->
+            <g id="compass-labels"></g>
+
+            <!-- 중앙 콤파스 별 (8각) -->
+            <g id="compass-star" transform="translate(210 210)">
+              <polygon points="0,-22 5,-5 22,0 5,5 0,22 -5,5 -22,0 -5,-5"
+                       fill="#fffaf0" stroke="#5a3a1f" stroke-width="1"/>
+              <polygon points="0,-12 3,-3 12,0 3,3 0,12 -3,3 -12,0 -3,-3"
+                       fill="#9b2226" opacity="0.85"/>
+              <circle r="2.5" fill="#fffaf0" stroke="#5a3a1f" stroke-width="0.8"/>
+            </g>
+
+            <!-- 현재 풍향 화살 (남서 235°) -->
+            <g class="vane-active" transform="translate(210 210) rotate(235)">
+              <line x1="0" y1="0" x2="0" y2="-160" stroke="#9b2226" stroke-width="2.5"/>
+              <polygon points="0,-170 -7,-152 7,-152" fill="#9b2226"/>
+              <!-- 깃털(보퍼트 깃대) -->
+              <line x1="0" y1="-80"  x2="14" y2="-86"  stroke="#9b2226" stroke-width="2"/>
+              <line x1="0" y1="-100" x2="14" y2="-106" stroke="#9b2226" stroke-width="2"/>
+              <line x1="0" y1="-120" x2="10" y2="-124" stroke="#9b2226" stroke-width="2"/>
+            </g>
+
+            <!-- 캘리그라픽 캡션 -->
+            <text x="210" y="408" text-anchor="middle"
+                  font-family="Cormorant Garamond, serif" font-style="italic"
+                  font-size="11" fill="#4a3f30">
+              Frequencies observed during the past 24 hours
+            </text>
+          </svg>
+        </div>
+
+        <!-- 윈드로즈 범례 -->
+        <div class="mt-4 flex items-center justify-between text-xs ink-soft flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5">
+              <svg width="16" height="10" viewBox="0 0 16 10"><rect width="16" height="10" fill="url(#hatch)"/></svg>
+              <span class="font-en italic">prevailing winds</span>
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <svg width="16" height="10" viewBox="0 0 16 10"><rect width="16" height="10" fill="url(#hatch-soft)"/></svg>
+              <span class="font-en italic">secondary winds</span>
+            </span>
+          </div>
+          <span class="font-en italic ink-faint">N ↑ true geographic north</span>
+        </div>
+      </article>
+
+      <!-- 우: 현재 관측 + 보퍼트 + sparkline -->
+      <article class="space-y-6">
+
+        <!-- 현재 관측 카드 -->
+        <section class="border border-[var(--ink-soft)] p-5 bg-[var(--paper)]/70 rounded-sm">
+          <div class="ornament mb-2">
+            <span>Present Observation</span>
+          </div>
+          <div class="text-center">
+            <p class="font-en italic text-xs ink-faint">CURRENT WIND</p>
+            <p class="mt-1 ink">
+              <span class="font-en text-7xl font-light tabular-nums">4.2</span>
+              <span class="font-en text-xl ink-faint ml-1">m / s</span>
+            </p>
+            <p class="mt-1 text-base ink-soft">
+              <span class="font-ko">남서</span>
+              <span class="font-en italic ink-faint ml-1.5">SW · 235°</span>
+            </p>
+            <p class="mt-3 inline-block px-3 py-0.5 border border-[var(--accent-red)] text-[var(--accent-red)] text-xs font-en italic tracking-wider">
+              FORCE 3 — Gentle Breeze
+            </p>
+          </div>
+
+          <!-- 메트릭 3개 -->
+          <div class="grid grid-cols-3 gap-2 mt-5">
+            <div class="metric p-2.5 text-center" role="group" aria-label="순간 돌풍">
+              <p class="metric-label text-[10px]">Gust</p>
+              <p class="font-en text-xl font-medium tabular-nums ink mt-0.5">6.8<span class="text-xs ink-faint">m/s</span></p>
+              <p class="text-[10px] ink-faint font-ko">순간 돌풍</p>
+            </div>
+            <div class="metric p-2.5 text-center" role="group" aria-label="보퍼트 등급">
+              <p class="metric-label text-[10px]">Beaufort</p>
+              <p class="font-en text-xl font-medium tabular-nums ink mt-0.5">3</p>
+              <p class="text-[10px] ink-faint font-ko">산들바람</p>
+            </div>
+            <div class="metric p-2.5 text-center" role="group" aria-label="기압">
+              <p class="metric-label text-[10px]">Press.</p>
+              <p class="font-en text-xl font-medium tabular-nums ink mt-0.5">1014<span class="text-xs ink-faint">hPa</span></p>
+              <p class="text-[10px] ink-faint font-ko">기압</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 24h 풍속 sparkline -->
+        <section class="border border-[var(--rule)] p-5 bg-[var(--paper)]/50 rounded-sm">
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-en italic text-sm ink-soft">Velocity, past XXIV hours</p>
+            <p class="font-en italic text-xs ink-faint">m/s</p>
+          </div>
+
+          <div class="relative">
+            <svg viewBox="0 0 320 110" class="w-full h-28" role="img"
+                 aria-label="24시간 풍속 추이 라인 차트, 평균 약 3.0 m/s">
+              <defs>
+                <linearGradient id="wind-area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"  stop-color="#9b2226" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#9b2226" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- 격자 -->
+              <g stroke="#c9b89a" stroke-width="0.4" stroke-dasharray="2 3">
+                <line x1="20" y1="20"  x2="320" y2="20"/>
+                <line x1="20" y1="50"  x2="320" y2="50"/>
+                <line x1="20" y1="80"  x2="320" y2="80"/>
+              </g>
+
+              <!-- y축 라벨 -->
+              <g class="axis-label">
+                <text x="2" y="23">5</text>
+                <text x="2" y="53">3</text>
+                <text x="2" y="83">1</text>
+              </g>
+
+              <!-- 풍속 영역 + 라인 (id로 JS 주입) -->
+              <path id="wind-area-path" fill="url(#wind-area)" d=""/>
+              <path id="wind-line-path" fill="none" stroke="#9b2226" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round" d=""/>
+              <!-- 돌풍 라인 (점선 보조) -->
+              <path id="gust-line-path" fill="none" stroke="#1d4e6f" stroke-width="1"
+                    stroke-dasharray="3 3" stroke-linecap="round" d=""/>
+
+              <!-- x축 라벨 -->
+              <g class="axis-label" text-anchor="middle">
+                <text x="32"  y="103">15h</text>
+                <text x="92"  y="103">21h</text>
+                <text x="158" y="103">03h</text>
+                <text x="226" y="103">09h</text>
+                <text x="295" y="103">14h</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] mt-2 ink-faint font-en italic">
+            <span><span class="inline-block w-3 h-0.5 align-middle" style="background:#9b2226"></span> mean</span>
+            <span><span class="inline-block w-3 h-px align-middle border-t border-dashed" style="border-color:#1d4e6f"></span> gust</span>
+            <span class="ink-soft tabular-nums">avg 3.0 · max 4.6</span>
+          </div>
+        </section>
+      </article>
+    </section>
+
+    <!-- 보퍼트 등급표 -->
+    <section class="mt-8 md:mt-10">
+      <div class="ornament mb-3">
+        <span>Plate II — Beaufort Wind Force Scale (Excerpt)</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="beaufort-tbl w-full text-left ink" aria-label="보퍼트 풍력 계급표">
+          <thead>
+            <tr>
+              <th class="w-12">No.</th>
+              <th>Description</th>
+              <th class="font-ko" style="font-style:normal;">한글 명칭</th>
+              <th class="text-right">Speed (m/s)</th>
+              <th>Sea / Land Effect</th>
+            </tr>
+          </thead>
+          <tbody class="font-ko text-[12px]">
+            <tr><td class="font-en tabular-nums">0</td><td class="font-en italic">Calm</td><td>고요</td><td class="text-right tabular-nums font-en">&lt; 0.3</td><td>연기가 수직으로 오름</td></tr>
+            <tr><td class="font-en tabular-nums">1</td><td class="font-en italic">Light Air</td><td>실바람</td><td class="text-right tabular-nums font-en">0.3 – 1.5</td><td>풍향계는 멈추나 연기로 풍향 식별</td></tr>
+            <tr><td class="font-en tabular-nums">2</td><td class="font-en italic">Light Breeze</td><td>남실바람</td><td class="text-right tabular-nums font-en">1.6 – 3.3</td><td>얼굴에 바람을 느낌</td></tr>
+            <tr class="active"><td class="font-en tabular-nums">3</td><td class="font-en italic">Gentle Breeze</td><td>산들바람</td><td class="text-right tabular-nums font-en">3.4 – 5.4</td><td>나뭇잎과 가는 가지가 흔들림 · <span class="font-en italic">현재 관측</span></td></tr>
+            <tr><td class="font-en tabular-nums">4</td><td class="font-en italic">Moderate Breeze</td><td>건들바람</td><td class="text-right tabular-nums font-en">5.5 – 7.9</td><td>먼지가 일고 작은 가지가 움직임</td></tr>
+            <tr><td class="font-en tabular-nums">5</td><td class="font-en italic">Fresh Breeze</td><td>흔들바람</td><td class="text-right tabular-nums font-en">8.0 – 10.7</td><td>잎이 무성한 작은 나무가 흔들림</td></tr>
+            <tr><td class="font-en tabular-nums">6</td><td class="font-en italic">Strong Breeze</td><td>된바람</td><td class="text-right tabular-nums font-en">10.8 – 13.8</td><td>큰 가지가 움직이고 우산 사용 곤란</td></tr>
+            <tr><td class="font-en tabular-nums">7+</td><td class="font-en italic">Near / Gale</td><td>센바람 ~</td><td class="text-right tabular-nums font-en">≥ 13.9</td><td>풍속 14 m/s 이상 — 강풍주의보 발효</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="mt-8 md:mt-10 pt-4 border-t border-[var(--rule)] flex items-center justify-between text-xs ink-faint font-en italic flex-wrap gap-2">
+      <span>Source · Korea Meteorological Administration · Station 108</span>
+      <span class="font-ko ink-soft" style="font-style:normal;">기상청 자동기상관측 (AWS) · 종로 관측소</span>
+      <span>Plate prepared 2026.05.06</span>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+  // ============ 더미 데이터 (03_dataviz_samples.json) ============
+  const WIND_NOW = {
+    wind_ms: 4.2, wind_dir_deg: 235, wind_dir_label: "남서", wind_gust_ms: 6.8, beaufort: 3
+  };
+
+  // 16방위 빈도 (sample.json: wind_distribution)
+  const WIND_DIST = [
+    { direction: "N",   deg: 0,    frequency_pct: 5,  avg_speed_ms: 2.1 },
+    { direction: "NNE", deg: 22.5, frequency_pct: 4,  avg_speed_ms: 2.4 },
+    { direction: "NE",  deg: 45,   frequency_pct: 8,  avg_speed_ms: 3.2 },
+    { direction: "ENE", deg: 67.5, frequency_pct: 6,  avg_speed_ms: 2.9 },
+    { direction: "E",   deg: 90,   frequency_pct: 7,  avg_speed_ms: 2.8 },
+    { direction: "ESE", deg: 112.5,frequency_pct: 5,  avg_speed_ms: 2.4 },
+    { direction: "SE",  deg: 135,  frequency_pct: 6,  avg_speed_ms: 2.6 },
+    { direction: "SSE", deg: 157.5,frequency_pct: 8,  avg_speed_ms: 3.1 },
+    { direction: "S",   deg: 180,  frequency_pct: 10, avg_speed_ms: 3.4 },
+    { direction: "SSW", deg: 202.5,frequency_pct: 12, avg_speed_ms: 3.8 },
+    { direction: "SW",  deg: 225,  frequency_pct: 15, avg_speed_ms: 4.2 },
+    { direction: "WSW", deg: 247.5,frequency_pct: 13, avg_speed_ms: 4.0 },
+    { direction: "W",   deg: 270,  frequency_pct: 9,  avg_speed_ms: 3.5 },
+    { direction: "WNW", deg: 292.5,frequency_pct: 6,  avg_speed_ms: 3.0 },
+    { direction: "NW",  deg: 315,  frequency_pct: 4,  avg_speed_ms: 2.5 },
+    { direction: "NNW", deg: 337.5,frequency_pct: 3,  avg_speed_ms: 2.2 }
+  ];
+
+  const WIND_24H = [
+    { hour: "15", wind_ms: 4.2, gust_ms: 6.8 },{ hour: "16", wind_ms: 4.5, gust_ms: 7.0 },
+    { hour: "17", wind_ms: 4.6, gust_ms: 7.2 },{ hour: "18", wind_ms: 4.4, gust_ms: 6.9 },
+    { hour: "19", wind_ms: 4.0, gust_ms: 6.4 },{ hour: "20", wind_ms: 3.5, gust_ms: 5.6 },
+    { hour: "21", wind_ms: 3.2, gust_ms: 5.0 },{ hour: "22", wind_ms: 2.9, gust_ms: 4.5 },
+    { hour: "23", wind_ms: 2.6, gust_ms: 4.1 },{ hour: "00", wind_ms: 2.4, gust_ms: 3.8 },
+    { hour: "01", wind_ms: 2.2, gust_ms: 3.5 },{ hour: "02", wind_ms: 2.0, gust_ms: 3.2 },
+    { hour: "03", wind_ms: 1.8, gust_ms: 2.9 },{ hour: "04", wind_ms: 1.7, gust_ms: 2.7 },
+    { hour: "05", wind_ms: 1.8, gust_ms: 2.9 },{ hour: "06", wind_ms: 2.0, gust_ms: 3.2 },
+    { hour: "07", wind_ms: 2.4, gust_ms: 3.8 },{ hour: "08", wind_ms: 2.8, gust_ms: 4.5 },
+    { hour: "09", wind_ms: 3.2, gust_ms: 5.1 },{ hour: "10", wind_ms: 3.5, gust_ms: 5.6 },
+    { hour: "11", wind_ms: 3.8, gust_ms: 6.1 },{ hour: "12", wind_ms: 4.0, gust_ms: 6.4 },
+    { hour: "13", wind_ms: 4.2, gust_ms: 6.7 },{ hour: "14", wind_ms: 4.3, gust_ms: 6.8 }
+  ];
+
+  // ============ 윈드로즈 렌더 ============
+  const CENTER = { x: 210, y: 210 };
+  const MAX_RADIUS = 165;
+  const MAX_FREQ = 15;
+
+  function deg2rad(d) { return d * Math.PI / 180; }
+
+  function pointOnCircle(cx, cy, r, deg) {
+    const rad = deg2rad(deg - 90); // 12시 방향이 0deg가 되도록 보정
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+
+  function sectorPath(centerX, centerY, deg, frequency, maxFreq, maxRadius) {
+    const halfWidth = 11.25;
+    const startDeg = deg - halfWidth;
+    const endDeg   = deg + halfWidth;
+    const radius = (frequency / maxFreq) * maxRadius;
+    const p1 = pointOnCircle(centerX, centerY, radius, startDeg);
+    const p2 = pointOnCircle(centerX, centerY, radius, endDeg);
+    return `M ${centerX},${centerY} L ${p1.x.toFixed(2)},${p1.y.toFixed(2)} A ${radius.toFixed(2)},${radius.toFixed(2)} 0 0,1 ${p2.x.toFixed(2)},${p2.y.toFixed(2)} Z`;
+  }
+
+  function beaufortStyle(speedMs) {
+    if (speedMs <= 3)  return { fill: '#1d4e6f', opacity: 0.55, stroke: '#1d4e6f' };  // 약함
+    if (speedMs <= 7)  return { fill: '#9b2226', opacity: 0.62, stroke: '#9b2226' };  // 보통
+    if (speedMs <= 13) return { fill: '#b67730', opacity: 0.7,  stroke: '#b67730' };  // 강함
+    return { fill: '#9b2226', opacity: 0.92, stroke: '#9b2226' };                     // 강풍
+  }
+
+  function renderRose() {
+    // 16 보조 방위선
+    const linesG = document.getElementById('bearing-lines');
+    let lineHtml = '';
+    WIND_DIST.forEach(d => {
+      const p = pointOnCircle(CENTER.x, CENTER.y, MAX_RADIUS, d.deg);
+      lineHtml += `<line x1="${CENTER.x}" y1="${CENTER.y}" x2="${p.x.toFixed(2)}" y2="${p.y.toFixed(2)}"/>`;
+    });
+    linesG.innerHTML = lineHtml;
+
+    // 16 풍향 부채꼴
+    const sectorsG = document.getElementById('wind-sectors');
+    sectorsG.innerHTML = WIND_DIST.map(d => {
+      const path = sectorPath(CENTER.x, CENTER.y, d.deg, d.frequency_pct, MAX_FREQ, MAX_RADIUS);
+      const style = beaufortStyle(d.avg_speed_ms);
+      const isCurrent = d.direction === 'SW';
+      const opacity = isCurrent ? 0.92 : style.opacity;
+      const titleEn = `${d.direction} · ${d.frequency_pct}% · avg ${d.avg_speed_ms} m/s`;
+      return `
+        <path d="${path}"
+              fill="${style.fill}" fill-opacity="${opacity}"
+              stroke="${style.stroke}" stroke-width="0.6" stroke-opacity="0.7"
+              ${isCurrent ? 'class="vane-active"' : ''}>
+          <title>${titleEn}</title>
+        </path>`;
+    }).join('');
+
+    // 16방위 라벨
+    const labelsG = document.getElementById('compass-labels');
+    const MAJOR = ['N','E','S','W'];
+    labelsG.innerHTML = WIND_DIST.map(d => {
+      const isMajor = MAJOR.includes(d.direction);
+      const labelR = isMajor ? 195 : 188;
+      const p = pointOnCircle(CENTER.x, CENTER.y, labelR, d.deg);
+      const fontSize = isMajor ? 18 : 10;
+      const cls = isMajor ? 'compass-label' : 'compass-label-sub';
+      return `<text x="${p.x.toFixed(1)}" y="${(p.y+ (isMajor?6:3)).toFixed(1)}"
+                    text-anchor="middle"
+                    class="${cls}"
+                    font-size="${fontSize}">${d.direction}</text>`;
+    }).join('');
+  }
+
+  // ============ 풍속 sparkline ============
+  function renderWindSparkline() {
+    const W = 320, H = 110, padL = 22, padR = 10, padT = 12, padB = 28;
+    const innerW = W - padL - padR;
+    const innerH = H - padT - padB;
+
+    const all = WIND_24H.flatMap(d => [d.wind_ms, d.gust_ms]);
+    const min = 0;
+    const max = Math.ceil(Math.max(...all));
+    const range = max - min || 1;
+
+    const stepX = innerW / (WIND_24H.length - 1);
+
+    const toPath = (vals) => vals.map((v, i) => {
+      const x = padL + i * stepX;
+      const y = padT + (1 - (v - min)/range) * innerH;
+      return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+
+    const winds = WIND_24H.map(d => d.wind_ms);
+    const gusts = WIND_24H.map(d => d.gust_ms);
+
+    const linePath = toPath(winds);
+    const gustPath = toPath(gusts);
+
+    // 영역
+    const lastX = (padL + (WIND_24H.length - 1) * stepX).toFixed(1);
+    const baseY = (padT + innerH).toFixed(1);
+    const areaPath = linePath + ` L ${lastX},${baseY} L ${padL.toFixed(1)},${baseY} Z`;
+
+    document.getElementById('wind-line-path').setAttribute('d', linePath);
+    document.getElementById('gust-line-path').setAttribute('d', gustPath);
+    document.getElementById('wind-area-path').setAttribute('d', areaPath);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderRose();
+    renderWindSparkline();
+  });
+</script>
+
+</body>
+</html>

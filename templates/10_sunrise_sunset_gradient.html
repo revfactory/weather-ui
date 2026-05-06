@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>일출·일몰 · 서울 · 2026년 5월 6일</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    --w-sunny: #f59e0b;
+    --w-sunny-soft: #fef3c7;
+    --w-sunny-deep: #c2410c;
+    --w-orange: #fb923c;
+    --w-rose: #f43f5e;
+    --w-night: #4338ca;
+    --w-night-soft: #a5b4fc;
+    --text-primary: #1c1917;
+    --text-secondary: #44403c;
+    --text-tertiary: #78716c;
+    --surface: rgba(255, 255, 255, 0.7);
+  }
+  html, body {
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum";
+    color: var(--text-primary);
+    min-height: 100vh;
+    background: #fffaf0;
+  }
+  body {
+    background-image:
+      radial-gradient(800px 600px at 8% 12%, #fde68a 0%, transparent 55%),
+      radial-gradient(900px 700px at 92% 18%, #fbcfe8 0%, transparent 55%),
+      radial-gradient(700px 600px at 50% 90%, #c7d2fe 0%, transparent 55%),
+      radial-gradient(900px 700px at 100% 100%, #fed7aa 0%, transparent 60%),
+      linear-gradient(180deg, #fff7ed 0%, #fef3c7 30%, #fbcfe8 65%, #c7d2fe 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+  /* 메쉬 orb 장식 */
+  .mesh-orb {
+    position: fixed;
+    border-radius: 9999px;
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 460px; height: 460px; top: -120px; left: -100px; background: radial-gradient(circle, #fbbf24 0%, transparent 70%); opacity: 0.5; }
+  .orb-2 { width: 520px; height: 520px; top: 35%; right: -160px; background: radial-gradient(circle, #f472b6 0%, transparent 70%); opacity: 0.4; }
+  .orb-3 { width: 420px; height: 420px; bottom: -100px; left: 30%; background: radial-gradient(circle, #818cf8 0%, transparent 70%); opacity: 0.45; }
+  .orb-4 { width: 320px; height: 320px; top: 18%; left: 45%; background: radial-gradient(circle, #fdba74 0%, transparent 70%); opacity: 0.35; }
+
+  main, header { position: relative; z-index: 1; }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 30px 60px -25px rgba(180, 83, 9, 0.25),
+      0 8px 24px -8px rgba(190, 24, 93, 0.18);
+  }
+  .glass-soft {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+
+  /* 태양 글로우 */
+  @keyframes sun-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50%      { transform: scale(1.08); opacity: 0.78; }
+  }
+  .sun-glow { transform-box: fill-box; transform-origin: center; animation: sun-pulse 3.6s ease-in-out infinite; }
+
+  @keyframes sun-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-2px); }
+  }
+  .sun-bob { animation: sun-bob 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  /* 호 그리기 애니메이션 */
+  @keyframes draw-arc {
+    from { stroke-dashoffset: 600; }
+    to   { stroke-dashoffset: 0; }
+  }
+  .arc-draw {
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: draw-arc 1.6s ease-out 0.2s forwards;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--w-orange);
+    outline-offset: 3px;
+    border-radius: 12px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 메쉬 orb 장식 -->
+<div class="mesh-orb orb-1" aria-hidden="true"></div>
+<div class="mesh-orb orb-2" aria-hidden="true"></div>
+<div class="mesh-orb orb-3" aria-hidden="true"></div>
+<div class="mesh-orb orb-4" aria-hidden="true"></div>
+
+<main class="max-w-5xl mx-auto p-4 md:p-8 pb-12">
+
+  <!-- 헤더 -->
+  <header class="flex items-end justify-between gap-4 mb-6 md:mb-8 flex-wrap">
+    <div>
+      <p class="text-xs uppercase tracking-[0.25em] text-amber-700/80">SUNRISE · SUNSET</p>
+      <h1 class="text-3xl md:text-4xl font-semibold text-stone-900 mt-1">서울 · 2026년 5월 6일</h1>
+      <p class="text-sm text-stone-600 mt-1">한국천문연구원 (KASI) · 절기 입하 다음날</p>
+    </div>
+    <div class="glass-soft rounded-full px-4 py-2 text-xs text-stone-600 inline-flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_2px_rgba(251,191,36,0.7)]"></span>
+      <span class="tabular-nums">현재 15:24 KST</span>
+      <span class="text-stone-400">·</span>
+      <span class="text-amber-700 font-medium">낮 진행 71%</span>
+    </div>
+  </header>
+
+  <!-- SunArc 메인 카드 -->
+  <section class="glass rounded-3xl p-6 md:p-10" aria-labelledby="arc-title">
+    <div class="flex items-center justify-between mb-4">
+      <h2 id="arc-title" class="text-lg font-semibold text-stone-800">태양 일주 곡선</h2>
+      <span class="text-xs text-stone-500 tabular-nums">진행도 71.2%</span>
+    </div>
+
+    <!-- 큰 SunArc SVG -->
+    <div class="relative">
+      <svg viewBox="0 0 600 280" class="w-full h-auto" role="img"
+           aria-label="태양 일주 호 차트, 일출 05시 38분, 일몰 19시 24분, 현재 위치 71.2퍼센트">
+        <title>일출 05:38 · 일몰 19:24 · 현재 71.2%</title>
+        <desc>호 위 점이 현재 시각의 태양 위치를 나타냄. 좌측 일출 우측 일몰.</desc>
+
+        <defs>
+          <!-- 하늘 그라데이션: 일출 → 정오 → 일몰 -->
+          <linearGradient id="sky-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#f43f5e"/>
+            <stop offset="20%"  stop-color="#fb923c"/>
+            <stop offset="50%"  stop-color="#38bdf8"/>
+            <stop offset="80%"  stop-color="#a78bfa"/>
+            <stop offset="100%" stop-color="#4338ca"/>
+          </linearGradient>
+
+          <!-- 호 두꺼운 형광 라인 -->
+          <linearGradient id="sky-grad-thick" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#fda4af" stop-opacity="0.5"/>
+            <stop offset="30%"  stop-color="#fdba74" stop-opacity="0.55"/>
+            <stop offset="60%"  stop-color="#bae6fd" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#c7d2fe" stop-opacity="0.55"/>
+          </linearGradient>
+
+          <!-- 영역 채움 (호 아래) -->
+          <linearGradient id="under-arc" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#fef3c7" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#fef3c7" stop-opacity="0"/>
+          </linearGradient>
+
+          <!-- 태양 발광 -->
+          <radialGradient id="sun-radial" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%"  stop-color="#fffbeb"/>
+            <stop offset="60%" stop-color="#fbbf24"/>
+            <stop offset="100%" stop-color="#f97316"/>
+          </radialGradient>
+
+          <filter id="sun-blur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6"/>
+          </filter>
+        </defs>
+
+        <!-- 박명 영역 (좌우 그라데이션 페이드) -->
+        <path d="M 0,230 L 600,230 L 600,260 L 0,260 Z" fill="#1e1b4b" opacity="0.04"/>
+
+        <!-- 호 아래 영역 -->
+        <path d="M 30,230 A 270,180 0 0,1 570,230 L 570,230 L 30,230 Z"
+              fill="url(#under-arc)"/>
+
+        <!-- 호 두꺼운 (글로우 라인) -->
+        <path d="M 30,230 A 270,180 0 0,1 570,230"
+              fill="none" stroke="url(#sky-grad-thick)" stroke-width="22"
+              stroke-linecap="round" opacity="0.7"/>
+
+        <!-- 호 메인 라인 -->
+        <path d="M 30,230 A 270,180 0 0,1 570,230"
+              fill="none" stroke="url(#sky-grad)" stroke-width="3.5"
+              stroke-linecap="round" class="arc-draw"/>
+
+        <!-- 지평선 -->
+        <line x1="0" y1="230" x2="600" y2="230" stroke="#78350f" stroke-width="1" opacity="0.35"/>
+        <line x1="0" y1="231" x2="600" y2="231" stroke="#78350f" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.25"/>
+
+        <!-- 정오 표식 -->
+        <line x1="300" y1="46" x2="300" y2="54" stroke="#a3a3a3" stroke-width="1"/>
+        <text x="300" y="40" text-anchor="middle" font-size="10" fill="#78716c" font-family="Pretendard Variable, sans-serif">정오 12:31</text>
+
+        <!-- 일출 / 일몰 마커 -->
+        <g>
+          <circle cx="30"  cy="230" r="5" fill="#fbbf24" stroke="#fff" stroke-width="2"/>
+          <text x="30"  y="262" text-anchor="middle" font-size="11" fill="#9a3412" font-family="Pretendard Variable, sans-serif" font-weight="600" style="font-variant-numeric:tabular-nums;">05:38</text>
+          <text x="30"  y="274" text-anchor="middle" font-size="9"  fill="#78716c" font-family="Pretendard Variable, sans-serif">일출</text>
+        </g>
+        <g>
+          <circle cx="570" cy="230" r="5" fill="#a78bfa" stroke="#fff" stroke-width="2"/>
+          <text x="570" y="262" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="Pretendard Variable, sans-serif" font-weight="600" style="font-variant-numeric:tabular-nums;">19:24</text>
+          <text x="570" y="274" text-anchor="middle" font-size="9"  fill="#78716c" font-family="Pretendard Variable, sans-serif">일몰</text>
+        </g>
+
+        <!-- 현재 태양 위치 (progress 71.2% → angle 180-71.2*1.8=51.84°, 보정 좌표 계산은 JS에서) -->
+        <g id="sun-marker">
+          <!-- 광채 -->
+          <circle id="sun-glow"  cx="0" cy="0" r="32" fill="url(#sun-radial)" filter="url(#sun-blur)" opacity="0.7" class="sun-glow"/>
+          <circle id="sun-glow2" cx="0" cy="0" r="20" fill="#fde68a" opacity="0.6" class="sun-glow"/>
+          <!-- 태양 본체 -->
+          <circle id="sun-body" cx="0" cy="0" r="14" fill="url(#sun-radial)" stroke="#fff" stroke-width="2" class="sun-bob"/>
+          <!-- 8 광선 -->
+          <g id="sun-rays" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" opacity="0.7"></g>
+          <!-- 라벨 말풍선 -->
+          <g id="sun-tip">
+            <rect x="-30" y="-58" width="60" height="20" rx="10" fill="#fff" stroke="#fbbf24" stroke-width="1.2"/>
+            <text x="0" y="-44" text-anchor="middle" font-size="11" fill="#9a3412" font-family="Pretendard Variable, sans-serif" font-weight="700" style="font-variant-numeric:tabular-nums;">15:24</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 하단 박명 타임라인 -->
+    <div class="mt-4 md:mt-6">
+      <p class="text-xs text-stone-500 mb-2 uppercase tracking-wider">박명 (twilight) 타임라인</p>
+      <div class="relative h-16">
+        <svg viewBox="0 0 600 64" class="w-full h-full" role="img" aria-label="천문/항해/시민 박명 타임라인, 일출 일몰 기준">
+          <defs>
+            <linearGradient id="twilight-grad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#1e1b4b"/>
+              <stop offset="8%"   stop-color="#3730a3"/>
+              <stop offset="14%"  stop-color="#7c3aed"/>
+              <stop offset="20%"  stop-color="#fb923c"/>
+              <stop offset="25%"  stop-color="#fde68a"/>
+              <stop offset="50%"  stop-color="#bae6fd"/>
+              <stop offset="75%"  stop-color="#fde68a"/>
+              <stop offset="80%"  stop-color="#fb923c"/>
+              <stop offset="86%"  stop-color="#7c3aed"/>
+              <stop offset="92%"  stop-color="#3730a3"/>
+              <stop offset="100%" stop-color="#1e1b4b"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="14" width="600" height="20" rx="10" fill="url(#twilight-grad)"/>
+
+          <!-- 박명 마커 (시각 기준 매핑) -->
+          <!-- 천문 새벽 03:55 (3.92h) → x = 3.92/24 * 600 = 98 -->
+          <!-- 항해 새벽 04:34 (4.57h) → 114, 시민 새벽 05:09 (5.15h) → 129, 일출 05:38 (5.63h) → 141 -->
+          <!-- 일몰 19:24 (19.4h) → 485, 시민 저녁 19:53 (19.88h) → 497, 항해 20:28 (20.47h) → 512, 천문 21:07 (21.12h) → 528 -->
+          <g>
+            <line x1="98"  y1="10" x2="98"  y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+            <line x1="114" y1="10" x2="114" y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+            <line x1="129" y1="10" x2="129" y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+            <line x1="141" y1="6"  x2="141" y2="42" stroke="#fbbf24" stroke-width="2"/>
+            <line x1="485" y1="6"  x2="485" y2="42" stroke="#a78bfa" stroke-width="2"/>
+            <line x1="497" y1="10" x2="497" y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+            <line x1="512" y1="10" x2="512" y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+            <line x1="528" y1="10" x2="528" y2="38" stroke="#fff" stroke-width="1" opacity="0.7"/>
+
+            <!-- 현재 시각 마커 15:24 (15.4h) → 385 -->
+            <line x1="385" y1="2"  x2="385" y2="46" stroke="#dc2626" stroke-width="1.5"/>
+            <polygon points="385,0 380,8 390,8" fill="#dc2626"/>
+          </g>
+
+          <!-- 라벨 -->
+          <g font-family="Pretendard Variable, sans-serif" fill="#44403c" font-size="9">
+            <text x="98"  y="60" text-anchor="middle">03:55</text>
+            <text x="141" y="60" text-anchor="middle" font-weight="600" fill="#9a3412">05:38 ↑</text>
+            <text x="485" y="60" text-anchor="middle" font-weight="600" fill="#5b21b6">19:24 ↓</text>
+            <text x="528" y="60" text-anchor="middle">21:07</text>
+          </g>
+        </svg>
+      </div>
+      <div class="mt-1 flex items-center justify-between text-[10px] text-stone-500">
+        <span>천문/항해/시민 박명</span>
+        <span class="inline-flex items-center gap-2">
+          <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>일출</span>
+          <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-violet-400"></span>일몰</span>
+          <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-rose-600"></span>현재 15:24</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 메트릭 카드 4개 -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6">
+    <article class="glass-soft rounded-2xl p-4" role="group" aria-label="일출 시각">
+      <div class="flex items-center gap-2 text-amber-700">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v8M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M8 6l4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
+        <p class="text-[10px] uppercase tracking-widest">일출 · Sunrise</p>
+      </div>
+      <p class="mt-2 text-3xl font-light tabular-nums text-stone-900">05:38</p>
+      <p class="text-xs text-stone-500 mt-1">방위 70° (ENE)</p>
+    </article>
+
+    <article class="glass-soft rounded-2xl p-4" role="group" aria-label="일몰 시각">
+      <div class="flex items-center gap-2 text-violet-700">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 10V2M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M16 6l-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
+        <p class="text-[10px] uppercase tracking-widest">일몰 · Sunset</p>
+      </div>
+      <p class="mt-2 text-3xl font-light tabular-nums text-stone-900">19:24</p>
+      <p class="text-xs text-stone-500 mt-1">방위 290° (WNW)</p>
+    </article>
+
+    <article class="glass-soft rounded-2xl p-4" role="group" aria-label="낮 길이">
+      <div class="flex items-center gap-2 text-orange-600">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <p class="text-[10px] uppercase tracking-widest">낮 길이 · Daylight</p>
+      </div>
+      <p class="mt-2 text-3xl font-light tabular-nums text-stone-900">13<span class="text-base text-stone-400 ml-0.5">h</span> 46<span class="text-base text-stone-400 ml-0.5">m</span></p>
+      <p class="text-xs text-emerald-700 mt-1 inline-flex items-center gap-1">
+        <svg viewBox="0 0 24 24" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        어제 대비 +2분
+      </p>
+    </article>
+
+    <article class="glass-soft rounded-2xl p-4" role="group" aria-label="다음 절기">
+      <div class="flex items-center gap-2 text-rose-700">
+        <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <p class="text-[10px] uppercase tracking-widest">다음 절기</p>
+      </div>
+      <p class="mt-2 text-2xl font-light text-stone-900">소만 <span class="font-en text-base text-stone-400">小滿</span></p>
+      <p class="text-xs text-stone-500 mt-1 tabular-nums">5월 21일 · D-15</p>
+    </article>
+  </section>
+
+  <!-- 7일 낮 길이 sparkline + 박명 디테일 -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-4">
+
+    <!-- 7일 낮 길이 sparkline -->
+    <article class="glass rounded-2xl p-5" aria-labelledby="daylight-7d">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 id="daylight-7d" class="text-sm font-semibold text-stone-800">7일 낮 길이 추이</h3>
+          <p class="text-[11px] text-stone-500">단위 시간:분 · 어제 대비 변화</p>
+        </div>
+        <span class="text-[11px] text-emerald-700 tabular-nums">+14분 / 7일</span>
+      </div>
+      <svg viewBox="0 0 320 80" class="w-full h-20" role="img" aria-label="7일 낮 길이 막대 차트, 매일 약 2분씩 증가">
+        <defs>
+          <linearGradient id="bar-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#fb923c" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.5"/>
+          </linearGradient>
+          <linearGradient id="bar-grad-now" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#dc2626" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#f97316" stop-opacity="0.6"/>
+          </linearGradient>
+        </defs>
+        <g id="daylight-bars"></g>
+        <g id="daylight-labels" font-family="Pretendard Variable, sans-serif" font-size="9" fill="#78716c" text-anchor="middle"></g>
+      </svg>
+    </article>
+
+    <!-- 박명 디테일 -->
+    <article class="glass rounded-2xl p-5">
+      <h3 class="text-sm font-semibold text-stone-800 mb-3">박명 시각 (천문대 기준)</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-900"></span>
+            천문 박명 시작
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">03:55</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-violet-700"></span>
+            항해 박명 시작
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">04:34</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+            시민 박명 시작
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">05:09</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60 bg-amber-50/40 -mx-2 px-2 rounded-md">
+          <dt class="text-amber-800 font-semibold inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            일출
+          </dt>
+          <dd class="font-bold text-amber-900 tabular-nums">05:38</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60 bg-violet-50/40 -mx-2 px-2 rounded-md">
+          <dt class="text-violet-800 font-semibold inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+            일몰
+          </dt>
+          <dd class="font-bold text-violet-900 tabular-nums">19:24</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+            시민 박명 종료
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">19:53</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-amber-100/60">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-violet-700"></span>
+            항해 박명 종료
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">20:28</dd>
+        </div>
+        <div class="flex items-center justify-between py-1.5">
+          <dt class="text-stone-600 inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-900"></span>
+            천문 박명 종료
+          </dt>
+          <dd class="font-medium text-stone-900 tabular-nums">21:07</dd>
+        </div>
+      </dl>
+    </article>
+  </section>
+
+  <!-- 푸터 -->
+  <footer class="mt-6 flex items-center justify-between text-[11px] text-stone-500 flex-wrap gap-2">
+    <span>출처 · 한국천문연구원 (KASI)</span>
+    <span>본 데이터는 서울 (37.57° N, 126.98° E) 기준</span>
+    <span class="tabular-nums">갱신 2026.05.06 00:00</span>
+  </footer>
+
+</main>
+
+<script>
+  // 더미 데이터 (sun_arc)
+  const SUN_ARC = {
+    sunrise: "05:38", sunset: "19:24", solar_noon: "12:31",
+    daylight_min: 826, current_progress_pct: 71.2, current_time: "15:24"
+  };
+
+  // 7일 낮 길이 (오늘 ±3일, 평균 2분씩 증가)
+  const DAYLIGHT_7D = [
+    { day: "일", min: 818, label: "5/3" },
+    { day: "월", min: 820, label: "5/4" },
+    { day: "화", min: 822, label: "5/5" },
+    { day: "수", min: 826, label: "5/6", isToday: true },
+    { day: "목", min: 828, label: "5/7" },
+    { day: "금", min: 830, label: "5/8" },
+    { day: "토", min: 832, label: "5/9" }
+  ];
+
+  // 호 위 태양 위치 계산 (호 path: M 30,230 A 270,180 0 0,1 570,230)
+  // 호의 중심: (300, 230), rx=270, ry=180
+  // angle: 180° - (progress * 180°) → 좌측(180°) 일출 → 우측(0°) 일몰
+  function sunPosition(progressPct) {
+    const p = progressPct / 100;
+    const angleRad = Math.PI - p * Math.PI;
+    const cx = 300, cy = 230, rx = 270, ry = 180;
+    return { x: cx + rx * Math.cos(angleRad), y: cy - ry * Math.sin(angleRad) };
+  }
+
+  function renderSun() {
+    const pos = sunPosition(SUN_ARC.current_progress_pct);
+    const marker = document.getElementById('sun-marker');
+    marker.setAttribute('transform', `translate(${pos.x.toFixed(1)} ${pos.y.toFixed(1)})`);
+    // 광선 8개
+    const rays = document.getElementById('sun-rays');
+    let html = '';
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI / 4);
+      const x1 = Math.cos(a) * 18, y1 = Math.sin(a) * 18;
+      const x2 = Math.cos(a) * 26, y2 = Math.sin(a) * 26;
+      html += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+    }
+    rays.innerHTML = html;
+  }
+
+  function renderDaylightBars() {
+    const g = document.getElementById('daylight-bars');
+    const labelsG = document.getElementById('daylight-labels');
+    const W = 320, H = 80;
+    const barW = 28, gap = (W - barW * 7) / 8;
+    const min = 800;
+    const max = 850;
+    let bars = '', labels = '';
+    DAYLIGHT_7D.forEach((d, i) => {
+      const x = gap + i * (barW + gap);
+      const h = ((d.min - min) / (max - min)) * 50;
+      const y = 60 - h;
+      const fill = d.isToday ? 'url(#bar-grad-now)' : 'url(#bar-grad)';
+      const radius = 4;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" rx="${radius}" fill="${fill}">
+                 <animate attributeName="height" from="0" to="${h.toFixed(1)}" dur="700ms" begin="${i*70}ms" fill="freeze"/>
+                 <animate attributeName="y"      from="60" to="${y.toFixed(1)}" dur="700ms" begin="${i*70}ms" fill="freeze"/>
+               </rect>`;
+      const cx = x + barW/2;
+      labels += `<text x="${cx.toFixed(1)}" y="74" font-weight="${d.isToday?'700':'400'}" fill="${d.isToday?'#9a3412':'#78716c'}">${d.day}</text>`;
+      labels += `<text x="${cx.toFixed(1)}" y="${(y - 4).toFixed(1)}" font-size="9" fill="${d.isToday?'#9a3412':'#78716c'}" style="font-variant-numeric:tabular-nums;">${Math.floor(d.min/60)}:${String(d.min%60).padStart(2,'0')}</text>`;
+    });
+    g.innerHTML = bars;
+    labelsG.innerHTML = labels;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderSun();
+    renderDaylightBars();
+  });
+</script>
+
+</body>
+</html>

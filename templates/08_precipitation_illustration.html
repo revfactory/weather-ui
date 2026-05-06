@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>강수 분석 · 서울 · 비 오는 오후</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: { fontFamily: { sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'] } } },
+  };
+</script>
+<style>
+  :root {
+    --w-rain: #0ea5e9;
+    --w-rain-heavy: #1d4ed8;
+    --w-rain-light: #7dd3fc;
+    --bg-from: #e0f2fe;
+    --bg-via: #bae6fd;
+    --bg-to: #93c5fd;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-tertiary: #64748b;
+  }
+  body {
+    background:
+      radial-gradient(1100px 600px at 80% -10%, rgba(125, 211, 252, 0.5), transparent 60%),
+      radial-gradient(900px 700px at 0% 110%, rgba(147, 197, 253, 0.55), transparent 60%),
+      linear-gradient(180deg, var(--bg-from) 0%, var(--bg-via) 60%, var(--bg-to) 100%);
+    color: var(--text-primary);
+    font-family: 'Pretendard Variable', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* 떠다니는 빗방울 배경 */
+  .rain-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .drop {
+    position: absolute;
+    width: 2px; height: 14px;
+    background: linear-gradient(to bottom, transparent, rgba(14, 165, 233, 0.55));
+    border-radius: 0 0 2px 2px;
+    animation: rainFall linear infinite;
+  }
+  @keyframes rainFall {
+    0%   { transform: translateY(-30vh); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(120vh); opacity: 0; }
+  }
+  .float-cloud {
+    animation: floatCloud 6s ease-in-out infinite;
+  }
+  @keyframes floatCloud {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .swing-umbrella {
+    transform-origin: 50% 12%;
+    animation: swing 4.5s ease-in-out infinite;
+  }
+  @keyframes swing {
+    0%, 100% { transform: rotate(-2deg); }
+    50%      { transform: rotate(2deg); }
+  }
+
+  :focus-visible { outline: 2px solid #1d4ed8; outline-offset: 3px; border-radius: 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    .drop { display: none; }
+  }
+
+  .card-glass {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 24px 48px -16px rgba(15, 23, 42, 0.18);
+  }
+  .pill-soft { background: #f0f9ff; color: #0c4a6e; }
+</style>
+</head>
+<body class="antialiased">
+
+  <!-- 빗방울 배경 -->
+  <div class="rain-bg" aria-hidden="true">
+    <div class="drop" style="left: 6%;  animation-duration: 1.4s; animation-delay: 0.1s;"></div>
+    <div class="drop" style="left: 12%; animation-duration: 1.6s; animation-delay: 0.5s;"></div>
+    <div class="drop" style="left: 18%; animation-duration: 1.2s; animation-delay: 0.9s;"></div>
+    <div class="drop" style="left: 24%; animation-duration: 1.7s; animation-delay: 0.3s;"></div>
+    <div class="drop" style="left: 32%; animation-duration: 1.3s; animation-delay: 1.1s;"></div>
+    <div class="drop" style="left: 41%; animation-duration: 1.5s; animation-delay: 0.6s;"></div>
+    <div class="drop" style="left: 49%; animation-duration: 1.8s; animation-delay: 0.2s;"></div>
+    <div class="drop" style="left: 57%; animation-duration: 1.4s; animation-delay: 0.8s;"></div>
+    <div class="drop" style="left: 64%; animation-duration: 1.6s; animation-delay: 0.4s;"></div>
+    <div class="drop" style="left: 72%; animation-duration: 1.3s; animation-delay: 1.0s;"></div>
+    <div class="drop" style="left: 79%; animation-duration: 1.7s; animation-delay: 0.7s;"></div>
+    <div class="drop" style="left: 87%; animation-duration: 1.5s; animation-delay: 0.5s;"></div>
+    <div class="drop" style="left: 94%; animation-duration: 1.4s; animation-delay: 0.9s;"></div>
+  </div>
+
+  <main class="relative z-10 min-h-screen flex items-center justify-center px-4 py-8 sm:py-12" role="main">
+    <article class="w-full max-w-2xl card-glass rounded-3xl p-6 sm:p-10" aria-labelledby="precip-heading">
+
+      <!-- 헤더 -->
+      <header class="flex items-baseline justify-between mb-2">
+        <div>
+          <p class="text-xs font-medium pill-soft inline-block px-2.5 py-1 rounded-full">
+            서울 · 종로구
+          </p>
+        </div>
+        <p class="num text-xs text-[var(--text-tertiary)]">
+          2026.05.06 · 15:24
+        </p>
+      </header>
+
+      <h1 id="precip-heading" class="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-3">
+        오늘 오후, 비가 시작돼요
+      </h1>
+      <p class="text-sm text-[var(--text-secondary)] mt-1">
+        오후 늦게부터 빗줄기 굵어짐 · <span class="font-semibold text-blue-700">우산 필수</span>
+      </p>
+
+      <!-- 일러스트 -->
+      <div class="flex justify-center my-7">
+        <svg class="w-56 h-56 sm:w-64 sm:h-64" viewBox="0 0 240 240" role="img"
+             aria-label="우산을 들고 있는 비 오는 날 일러스트">
+          <title>비 오는 오후 · 우산</title>
+          <defs>
+            <linearGradient id="cloud-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#cbd5e1"/>
+              <stop offset="100%" stop-color="#94a3b8"/>
+            </linearGradient>
+            <linearGradient id="umb-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0ea5e9"/>
+              <stop offset="100%" stop-color="#1d4ed8"/>
+            </linearGradient>
+            <linearGradient id="drop-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7dd3fc"/>
+              <stop offset="100%" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+
+          <!-- 구름 (둥둥) -->
+          <g class="float-cloud">
+            <ellipse cx="80" cy="58" rx="40" ry="22" fill="url(#cloud-grad)"/>
+            <ellipse cx="120" cy="48" rx="44" ry="28" fill="url(#cloud-grad)"/>
+            <ellipse cx="160" cy="62" rx="36" ry="20" fill="url(#cloud-grad)"/>
+            <rect x="42" y="56" width="158" height="22" rx="11" fill="url(#cloud-grad)"/>
+            <!-- 구름 하이라이트 -->
+            <ellipse cx="100" cy="42" rx="22" ry="8" fill="#e2e8f0" opacity="0.7"/>
+          </g>
+
+          <!-- 빗방울 (구름 아래) -->
+          <g fill="url(#drop-grad)" opacity="0.85">
+            <path d="M68 96 q-3 6 0 10 a3 3 0 0 0 6 0 q3 -4 0 -10 z"/>
+            <path d="M92 100 q-3 6 0 10 a3 3 0 0 0 6 0 q3 -4 0 -10 z"/>
+            <path d="M120 92 q-3 6 0 10 a3 3 0 0 0 6 0 q3 -4 0 -10 z"/>
+            <path d="M144 100 q-3 6 0 10 a3 3 0 0 0 6 0 q3 -4 0 -10 z"/>
+            <path d="M168 96 q-3 6 0 10 a3 3 0 0 0 6 0 q3 -4 0 -10 z"/>
+          </g>
+
+          <!-- 우산 -->
+          <g class="swing-umbrella">
+            <!-- 우산 살 -->
+            <path d="M50 168 Q120 92 190 168 Z" fill="url(#umb-grad)"/>
+            <!-- 우산 윤곽 -->
+            <path d="M50 168 Q120 92 190 168" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linejoin="round"/>
+            <!-- 우산 살 분할선 -->
+            <path d="M50 168 Q85 130 120 168 Q155 130 190 168" fill="none" stroke="#1e3a8a" stroke-width="1.5" opacity="0.6"/>
+            <!-- 우산 끝 점 (스캘롭) -->
+            <path d="M50 168 q12 8 24 0 q12 8 24 0 q12 8 24 0 q12 8 24 0 q12 8 24 0 q12 8 24 0"
+                  fill="#1e40af" />
+            <!-- 우산 손잡이 -->
+            <path d="M120 96 L120 200 Q120 218 138 218" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="120" cy="96" r="3" fill="#1e3a8a"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 핵심 수치 -->
+      <section class="grid grid-cols-3 gap-3 sm:gap-4" role="group" aria-label="강수 핵심 지표">
+        <div class="rounded-2xl bg-white/80 p-4 text-center border border-sky-100">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">현재</p>
+          <p class="num text-2xl sm:text-3xl font-light text-blue-700 mt-1">0<span class="text-xs text-[var(--text-tertiary)] ml-0.5">mm/h</span></p>
+          <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">아직 멎음</p>
+        </div>
+        <div class="rounded-2xl bg-white/80 p-4 text-center border border-sky-100">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">24h 누적</p>
+          <p class="num text-2xl sm:text-3xl font-light text-blue-700 mt-1">12<span class="text-xs text-[var(--text-tertiary)] ml-0.5">mm</span></p>
+          <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">약함</p>
+        </div>
+        <div class="rounded-2xl bg-white/80 p-4 text-center border border-sky-100">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">내일 예상</p>
+          <p class="num text-2xl sm:text-3xl font-light text-blue-900 mt-1">32<span class="text-xs text-[var(--text-tertiary)] ml-0.5">mm</span></p>
+          <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">보통</p>
+        </div>
+      </section>
+
+      <!-- PrecipitationDots (향후 6시간) -->
+      <section class="mt-7" aria-labelledby="dots-heading">
+        <div class="flex items-baseline justify-between mb-3">
+          <h2 id="dots-heading" class="text-sm font-semibold text-[var(--text-secondary)]">향후 6시간</h2>
+          <p class="text-[11px] text-[var(--text-tertiary)]">크기 = 강수량 · 색 = 확률</p>
+        </div>
+        <div class="rounded-2xl bg-white/70 p-4">
+          <ol id="dots-row" class="flex items-end justify-between gap-2 h-14"></ol>
+          <ol id="hours-row" class="flex items-center justify-between gap-2 mt-2 num text-[10px] text-[var(--text-tertiary)]"></ol>
+        </div>
+      </section>
+
+      <!-- 시간별 강수량 누적 영역 (ApexCharts) -->
+      <section class="mt-6" aria-labelledby="area-heading">
+        <h2 id="area-heading" class="text-sm font-semibold text-[var(--text-secondary)] mb-1">
+          시간별 강수량 추이
+        </h2>
+        <p class="text-[11px] text-[var(--text-tertiary)] mb-2">단위 mm/h · 누적 영역 차트</p>
+        <div class="rounded-2xl bg-white/70 p-3">
+          <div id="precip-area" class="w-full" style="min-height: 180px;"></div>
+        </div>
+      </section>
+
+      <!-- 푸터 -->
+      <footer class="mt-6 flex items-center justify-between text-[10px] text-[var(--text-tertiary)]">
+        <span>KMA 단기예보 · 종로구 측정소</span>
+        <span class="num">UPD 15:24 KST</span>
+      </footer>
+    </article>
+  </main>
+
+  <script>
+    // PrecipitationDots — 03_dataviz_samples.json `precip_hourly_6h`
+    const hourly6 = [
+      { hour: "16", precip_mm: 0.0,  precip_prob_pct: 15 },
+      { hour: "17", precip_mm: 0.4,  precip_prob_pct: 25 },
+      { hour: "18", precip_mm: 1.8,  precip_prob_pct: 35 },
+      { hour: "19", precip_mm: 4.2,  precip_prob_pct: 50 },
+      { hour: "20", precip_mm: 6.8,  precip_prob_pct: 70 },
+      { hour: "21", precip_mm: 5.4,  precip_prob_pct: 80 },
+    ];
+    function dotSizePx(mm) {
+      if (mm < 0.5) return 10;
+      if (mm < 2)   return 16;
+      if (mm < 5)   return 24;
+      return 34;
+    }
+    function dotColor(p) {
+      if (p < 31) return '#cbd5e1';     // slate-300
+      if (p < 61) return '#7dd3fc';     // sky-300
+      if (p < 81) return '#0ea5e9';     // sky-500
+      return '#1d4ed8';                  // blue-700
+    }
+    function probLabel(p) {
+      if (p < 31) return "낮음";
+      if (p < 61) return "보통";
+      if (p < 81) return "높음";
+      return "매우높음";
+    }
+    const dotsRow = document.getElementById('dots-row');
+    const hoursRow = document.getElementById('hours-row');
+    hourly6.forEach(h => {
+      const sz = dotSizePx(h.precip_mm);
+      const li = document.createElement('li');
+      li.className = "flex flex-col items-center justify-end h-full";
+      li.innerHTML = `
+        <span class="rounded-full block"
+              style="width:${sz}px;height:${sz}px;background:${dotColor(h.precip_prob_pct)};
+                     box-shadow: 0 4px 8px rgba(14, 165, 233, 0.25);"
+              role="img"
+              aria-label="${h.hour}시 강수확률 ${h.precip_prob_pct}퍼센트(${probLabel(h.precip_prob_pct)}), 강수량 ${h.precip_mm}mm"></span>
+      `;
+      dotsRow.appendChild(li);
+
+      const li2 = document.createElement('li');
+      li2.className = "flex flex-col items-center";
+      li2.innerHTML = `<span>${h.hour}시</span><span class="text-[9px] mt-0.5">${h.precip_prob_pct}%</span>`;
+      hoursRow.appendChild(li2);
+    });
+
+    // ApexCharts 누적 영역
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const opts = {
+      chart: {
+        type: 'area',
+        height: 200,
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: '"Pretendard Variable", sans-serif',
+        animations: { enabled: !reduced, speed: 400 },
+      },
+      series: [{
+        name: '강수량',
+        data: hourly6.map(h => ({ x: h.hour + '시', y: h.precip_mm })),
+      }],
+      stroke: { curve: 'smooth', width: 3, colors: ['#1d4ed8'] },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          opacityFrom: 0.55,
+          opacityTo: 0.05,
+          stops: [0, 100],
+          colorStops: [
+            { offset: 0,   color: '#1d4ed8', opacity: 0.5 },
+            { offset: 100, color: '#0ea5e9', opacity: 0.04 },
+          ],
+        },
+      },
+      dataLabels: { enabled: false },
+      grid: {
+        borderColor: '#e2e8f0',
+        strokeDashArray: 3,
+        padding: { left: 10, right: 10, top: 0 },
+      },
+      xaxis: {
+        labels: { style: { colors: '#64748b', fontSize: '11px', fontFamily: 'inherit' } },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+      },
+      yaxis: {
+        labels: {
+          style: { colors: '#64748b', fontSize: '11px', fontFamily: 'inherit' },
+          formatter: v => v.toFixed(1),
+        },
+        title: { text: 'mm/h', style: { color: '#94a3b8', fontSize: '10px' } },
+      },
+      tooltip: {
+        theme: 'light',
+        y: { formatter: v => v.toFixed(1) + ' mm/h' },
+      },
+      markers: { size: 4, colors: ['#1d4ed8'], strokeColors: '#fff', strokeWidth: 2 },
+    };
+    new ApexCharts(document.querySelector('#precip-area'), opts).render();
+  </script>
+</body>
+</html>

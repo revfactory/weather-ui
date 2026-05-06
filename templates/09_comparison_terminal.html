@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ko" class="dark" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>weather --compare · 도시 비교 — Terminal</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          mono: ['"JetBrains Mono"','"D2Coding"','"SF Mono"','ui-monospace','SFMono-Regular','Menlo','Consolas','"Liberation Mono"','monospace'],
+          sans: ['"Pretendard Variable"','Pretendard','-apple-system','system-ui','sans-serif']
+        }
+      }
+    }
+  };
+</script>
+<style>
+  :root {
+    --term-bg:#06080d;
+    --term-panel:#0b1018;
+    --term-panel-2:#0f1623;
+    --term-border:#1f2a3b;
+    --term-border-strong:#2c3a52;
+    --term-text:#cbd5e1;
+    --term-text-dim:#64748b;
+    --term-text-bright:#e2e8f0;
+    --term-green:#34d399;       /* good */
+    --term-cyan:#22d3ee;        /* primary accent */
+    --term-amber:#fbbf24;       /* caution */
+    --term-orange:#fb923c;      /* unhealthy */
+    --term-red:#f87171;         /* very unhealthy */
+    --term-blue:#60a5fa;        /* cool/down */
+    --term-magenta:#c084fc;     /* hazardous */
+    --focus-ring:#22d3ee;
+  }
+  html, body { background: var(--term-bg); color: var(--term-text); }
+  body {
+    font-family: '"JetBrains Mono"','"D2Coding"','"SF Mono"',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 8% -10%, rgba(34,211,238,.08), transparent 40%),
+      radial-gradient(circle at 95% 105%, rgba(192,132,252,.06), transparent 40%);
+    min-height: 100vh;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  /* Subtle scanline overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.012) 0px,
+      rgba(255,255,255,.012) 1px,
+      transparent 1px,
+      transparent 3px);
+    mix-blend-mode: overlay;
+  }
+  .panel {
+    background: var(--term-panel);
+    border: 1px solid var(--term-border);
+    box-shadow: 0 0 0 1px rgba(34,211,238,.05) inset;
+  }
+  .ascii { white-space: pre; line-height: 1.15; }
+  .blink { animation: blink 1.05s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .row-stripe:nth-child(even) { background: rgba(255,255,255,.018); }
+  .row-stripe:hover { background: rgba(34,211,238,.06); }
+  .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.55;transform:scale(.92);} }
+  /* Dot bar bar */
+  .bar-track { position: relative; height: 4px; background: rgba(148,163,184,.15); border-radius: 2px; overflow: hidden; }
+  .bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
+  .grade-good     { color: var(--term-green); }
+  .grade-moderate { color: var(--term-cyan); }
+  .grade-unhealthy{ color: var(--term-orange); }
+  .grade-vunhealthy{color: var(--term-red); }
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .blink, .pulse-dot { animation: none; opacity: 1; }
+    body::before { display: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<main class="relative max-w-6xl mx-auto px-3 sm:px-5 lg:px-7 py-5 sm:py-7 text-[13px] sm:text-sm">
+
+  <!-- ASCII header -->
+  <header class="mb-4 sm:mb-5">
+    <pre class="ascii text-[var(--term-cyan)] text-[10px] sm:text-xs leading-tight overflow-x-auto" aria-label="ASCII 로고 weather.kr cli">┌─[ weather.kr ]──────────────────────────────────────────────────────────────┐
+│  $ weather --compare seoul busan jeju daegu incheon gangneung gwangju       │
+└─────────────────────────────────────────────────────────────────────────────┘</pre>
+    <div class="mt-2 flex items-center justify-between flex-wrap gap-2 text-[11px]">
+      <div class="flex items-center gap-3 text-[var(--term-text-dim)]">
+        <span><span class="text-[var(--term-cyan)]">user@kma</span><span class="text-[var(--term-text-dim)]">:</span><span class="text-[var(--term-magenta)]">~/compare</span><span class="text-[var(--term-text-dim)]">$</span></span>
+        <span>v2.6.4 — KST 2026-05-06 15:24<span class="blink ml-0.5">_</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 border border-[var(--term-border)] rounded text-[10px] uppercase tracking-widest text-[var(--term-green)]">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--term-green)] pulse-dot"></span>
+          UP
+        </span>
+        <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 border border-[var(--term-border)] rounded text-[10px] uppercase tracking-widest text-[var(--term-text-dim)]">
+          7 cities · 9 fields
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Status strip -->
+  <section class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-[11px]" aria-label="요약 통계">
+    <div class="panel rounded-md px-3 py-2.5">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)]">최고 기온</p>
+      <p class="mt-0.5 tabular-nums">
+        <span class="text-[var(--term-orange)] text-base font-semibold">25°C</span>
+        <span class="text-[var(--term-text-dim)] ml-1.5">대구</span>
+      </p>
+    </div>
+    <div class="panel rounded-md px-3 py-2.5">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)]">최저 기온</p>
+      <p class="mt-0.5 tabular-nums">
+        <span class="text-[var(--term-blue)] text-base font-semibold">19°C</span>
+        <span class="text-[var(--term-text-dim)] ml-1.5">강릉</span>
+      </p>
+    </div>
+    <div class="panel rounded-md px-3 py-2.5">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)]">최고 KHAI</p>
+      <p class="mt-0.5 tabular-nums">
+        <span class="text-[var(--term-orange)] text-base font-semibold">108</span>
+        <span class="text-[var(--term-text-dim)] ml-1.5">대구 (나쁨)</span>
+      </p>
+    </div>
+    <div class="panel rounded-md px-3 py-2.5">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)]">강수 위험</p>
+      <p class="mt-0.5 tabular-nums">
+        <span class="text-[var(--term-cyan)] text-base font-semibold">70%</span>
+        <span class="text-[var(--term-text-dim)] ml-1.5">제주</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Sort controls (terminal style) -->
+  <div class="mb-2 flex items-center justify-between text-[11px] flex-wrap gap-2" aria-label="정렬 컨트롤">
+    <div class="text-[var(--term-text-dim)]">
+      <span class="text-[var(--term-magenta)]">›</span> sort by:
+      <button data-sort="temp_c" class="ml-1.5 sort-btn px-1.5 py-0.5 border border-[var(--term-border)] hover:border-[var(--term-cyan)] hover:text-[var(--term-cyan)] rounded transition-colors">temp</button>
+      <button data-sort="khai" class="sort-btn px-1.5 py-0.5 border border-[var(--term-border)] hover:border-[var(--term-cyan)] hover:text-[var(--term-cyan)] rounded transition-colors">khai</button>
+      <button data-sort="precip_prob_pct" class="sort-btn px-1.5 py-0.5 border border-[var(--term-border)] hover:border-[var(--term-cyan)] hover:text-[var(--term-cyan)] rounded transition-colors">precip</button>
+      <button data-sort="city" class="sort-btn px-1.5 py-0.5 border border-[var(--term-border)] hover:border-[var(--term-cyan)] hover:text-[var(--term-cyan)] rounded transition-colors">name</button>
+    </div>
+    <span class="text-[10px] text-[var(--term-text-dim)] uppercase tracking-widest">
+      ↑/↓ 키로 정렬 토글
+    </span>
+  </div>
+
+  <!-- Comparison table panel -->
+  <section class="panel rounded-md overflow-hidden" aria-label="도시 비교 테이블">
+    <div class="overflow-x-auto">
+      <table class="w-full" role="table">
+        <thead class="text-[var(--term-text-dim)] text-[10px] uppercase tracking-widest">
+          <tr class="border-b border-[var(--term-border)] bg-black/30">
+            <th scope="col" class="text-left font-normal px-3 py-2">CITY</th>
+            <th scope="col" class="text-left font-normal px-2 py-2 hidden sm:table-cell">COND</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 tabular-nums">TEMP</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 hidden md:table-cell tabular-nums">ΔY</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 hidden lg:table-cell tabular-nums">RH%</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 tabular-nums">PM2.5</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 tabular-nums">KHAI</th>
+            <th scope="col" class="text-right font-normal px-2 py-2 hidden md:table-cell tabular-nums">P%</th>
+            <th scope="col" class="text-left font-normal px-3 py-2 hidden lg:table-cell">GRADE</th>
+          </tr>
+        </thead>
+        <tbody id="rows" class="text-[12.5px]"></tbody>
+      </table>
+    </div>
+    <!-- Footer of panel -->
+    <div class="border-t border-[var(--term-border)] bg-black/40 px-3 py-2 flex items-center justify-between text-[10px] text-[var(--term-text-dim)]">
+      <span><span class="text-[var(--term-green)]">●</span> 7 rows · execution OK · 0.018s</span>
+      <span class="hidden sm:inline">env: ASIA/SEOUL · src: KMA · sig: env-mod</span>
+    </div>
+  </section>
+
+  <!-- diff vs yesterday + log -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
+    <article class="panel rounded-md p-4" aria-label="어제 대비 변화">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)] mb-2">
+        <span class="text-[var(--term-magenta)]">›</span> diff --vs=yesterday
+      </p>
+      <ul class="space-y-1.5 text-[12px]">
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Daegu</span>
+          <span class="tabular-nums text-[var(--term-orange)]">+3.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Seoul</span>
+          <span class="tabular-nums text-[var(--term-orange)]">+2.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Gwangju</span>
+          <span class="tabular-nums text-[var(--term-orange)]">+2.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Busan</span>
+          <span class="tabular-nums text-[var(--term-orange)]">+1.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Incheon</span>
+          <span class="tabular-nums text-[var(--term-orange)]">+1.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Gangneung</span>
+          <span class="tabular-nums text-[var(--term-text-dim)]">±0.0°C</span></li>
+        <li class="flex justify-between"><span class="text-[var(--term-text)]">Jeju</span>
+          <span class="tabular-nums text-[var(--term-blue)]">−1.0°C</span></li>
+      </ul>
+    </article>
+
+    <article class="panel rounded-md p-4" aria-label="시스템 로그">
+      <p class="text-[10px] uppercase tracking-widest text-[var(--term-text-dim)] mb-2">
+        <span class="text-[var(--term-magenta)]">›</span> tail -f /var/log/weather.log
+      </p>
+      <ul class="space-y-1 text-[11.5px] leading-snug font-mono">
+        <li><span class="text-[var(--term-text-dim)]">[15:23:58]</span> <span class="text-[var(--term-green)]">INFO </span> fetch kma · 7/7 ok · 412ms</li>
+        <li><span class="text-[var(--term-text-dim)]">[15:24:01]</span> <span class="text-[var(--term-cyan)]">DATA </span> aqi:airkorea hydrate · 1.2KB</li>
+        <li><span class="text-[var(--term-text-dim)]">[15:24:02]</span> <span class="text-[var(--term-amber)]">WARN </span> daegu khai=108 → grade=나쁨</li>
+        <li><span class="text-[var(--term-text-dim)]">[15:24:02]</span> <span class="text-[var(--term-amber)]">WARN </span> jeju precip_prob=70% &gt; 60</li>
+        <li><span class="text-[var(--term-text-dim)]">[15:24:03]</span> <span class="text-[var(--term-green)]">OK   </span> render compare table · 7 rows</li>
+        <li><span class="text-[var(--term-text-dim)]">[15:24:03]</span> <span class="text-[var(--term-text-dim)]">DEBUG</span> sort=khai dir=desc cols=9</li>
+        <li><span class="text-[var(--term-cyan)]">$ <span class="blink">_</span></span></li>
+      </ul>
+    </article>
+  </section>
+
+  <footer class="mt-5 text-[10px] text-[var(--term-text-dim)] text-center uppercase tracking-widest">
+    src: 기상청·환경부 · ui=terminal · wcag-aa
+  </footer>
+</main>
+
+<script>
+  // ============== 더미 데이터 (samples.json: cities_compare) ==============
+  const CITIES = [
+    { city:"서울",   city_en:"Seoul",     icon:"partly_cloudy", condition:"부분 흐림", temp_c:22, precip_prob_pct:20, humidity_pct:58, pm25_ugm3:28, khai:92,  wind_ms:2.4, delta_temp_yesterday_c:  2 },
+    { city:"부산",   city_en:"Busan",     icon:"clear",         condition:"맑음",     temp_c:24, precip_prob_pct:15, humidity_pct:70, pm25_ugm3:18, khai:56,  wind_ms:4.2, delta_temp_yesterday_c:  1 },
+    { city:"제주",   city_en:"Jeju",      icon:"rain",          condition:"비",       temp_c:21, precip_prob_pct:70, humidity_pct:82, pm25_ugm3:14, khai:38,  wind_ms:5.4, delta_temp_yesterday_c: -1 },
+    { city:"대구",   city_en:"Daegu",     icon:"clear",         condition:"맑음",     temp_c:25, precip_prob_pct:5,  humidity_pct:50, pm25_ugm3:38, khai:108, wind_ms:1.8, delta_temp_yesterday_c:  3 },
+    { city:"인천",   city_en:"Incheon",   icon:"partly_cloudy", condition:"구름조금", temp_c:21, precip_prob_pct:25, humidity_pct:65, pm25_ugm3:30, khai:88,  wind_ms:3.8, delta_temp_yesterday_c:  1 },
+    { city:"강릉",   city_en:"Gangneung", icon:"clear",         condition:"맑음",     temp_c:19, precip_prob_pct:10, humidity_pct:58, pm25_ugm3:22, khai:62,  wind_ms:2.2, delta_temp_yesterday_c:  0 },
+    { city:"광주",   city_en:"Gwangju",   icon:"clear",         condition:"맑음",     temp_c:23, precip_prob_pct:10, humidity_pct:60, pm25_ugm3:24, khai:78,  wind_ms:2.6, delta_temp_yesterday_c:  2 }
+  ];
+
+  // ============== Threshold mappers ==============
+  function khaiGrade(v) {
+    if (v <= 50) return { label:'좋음',     cls:'grade-good',     solid:'var(--term-green)' };
+    if (v <= 100) return { label:'보통',     cls:'grade-moderate', solid:'var(--term-cyan)' };
+    if (v <= 250) return { label:'나쁨',     cls:'grade-unhealthy',solid:'var(--term-orange)' };
+    return            { label:'매우나쁨', cls:'grade-vunhealthy',solid:'var(--term-red)' };
+  }
+  function pm25Grade(v) {
+    if (v <= 15) return { label:'좋음',     cls:'grade-good',     solid:'var(--term-green)' };
+    if (v <= 35) return { label:'보통',     cls:'grade-moderate', solid:'var(--term-cyan)' };
+    if (v <= 75) return { label:'나쁨',     cls:'grade-unhealthy',solid:'var(--term-orange)' };
+    return            { label:'매우나쁨', cls:'grade-vunhealthy',solid:'var(--term-red)' };
+  }
+  function tempColor(c) {
+    if (c <= 4)  return 'text-[var(--term-blue)]';
+    if (c <= 17) return 'text-[var(--term-blue)]';
+    if (c <= 26) return 'text-[var(--term-text-bright)]';
+    if (c <= 32) return 'text-[var(--term-orange)]';
+    return 'text-[var(--term-red)]';
+  }
+  function precipColor(p) {
+    if (p < 31) return 'text-[var(--term-text-dim)]';
+    if (p < 61) return 'text-[var(--term-cyan)]';
+    if (p < 81) return 'text-[var(--term-blue)]';
+    return 'text-[var(--term-magenta)]';
+  }
+  function deltaColor(d) {
+    if (d > 0) return 'text-[var(--term-orange)]';
+    if (d < 0) return 'text-[var(--term-blue)]';
+    return 'text-[var(--term-text-dim)]';
+  }
+  function deltaSign(d) {
+    if (d > 0) return `+${d.toFixed(1)}`;
+    if (d < 0) return `${d.toFixed(1).replace('-','−')}`;
+    return '±0.0';
+  }
+  function condGlyph(key) {
+    const m = {
+      clear: '☀',
+      partly_cloudy: '⛅',
+      cloudy: '☁',
+      rain: '☂',
+      snow: '❄',
+      thunderstorm: '⚡',
+      fog: '▨',
+      night_clear: '☾'
+    };
+    return m[key] || '·';
+  }
+  function condColor(key) {
+    const m = {
+      clear: 'text-[var(--term-amber)]',
+      partly_cloudy: 'text-[var(--term-cyan)]',
+      cloudy: 'text-[var(--term-text-dim)]',
+      rain: 'text-[var(--term-blue)]',
+      snow: 'text-[var(--term-cyan)]',
+      thunderstorm: 'text-[var(--term-magenta)]',
+      fog: 'text-[var(--term-text-dim)]',
+      night_clear: 'text-[var(--term-magenta)]'
+    };
+    return m[key] || '';
+  }
+
+  // ============== Render rows ==============
+  let currentSort = { key:'khai', dir:'desc' };
+  function rowsSorted() {
+    const arr = [...CITIES];
+    const k = currentSort.key;
+    arr.sort((a,b) => {
+      const av = a[k], bv = b[k];
+      if (typeof av === 'string') return currentSort.dir === 'asc' ? av.localeCompare(bv,'ko') : bv.localeCompare(av,'ko');
+      return currentSort.dir === 'asc' ? av - bv : bv - av;
+    });
+    return arr;
+  }
+  const maxKhai = Math.max(...CITIES.map(c=>c.khai));
+  function renderRows() {
+    const tbody = document.getElementById('rows');
+    tbody.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    rowsSorted().forEach(c => {
+      const k = khaiGrade(c.khai);
+      const pmG = pm25Grade(c.pm25_ugm3);
+      const fillPct = Math.max(6, Math.min(100, (c.khai / Math.max(maxKhai, 120)) * 100));
+      const tr = document.createElement('tr');
+      tr.className = 'row-stripe border-b border-[var(--term-border)]/60';
+      tr.innerHTML = `
+        <td class="px-3 py-2">
+          <div class="flex items-center gap-2 min-w-[7.2rem]">
+            <span class="text-[var(--term-text-dim)]">›</span>
+            <span class="text-[var(--term-text-bright)] font-medium">${c.city}</span>
+            <span class="text-[10px] text-[var(--term-text-dim)] hidden sm:inline">${c.city_en}</span>
+          </div>
+        </td>
+        <td class="px-2 py-2 hidden sm:table-cell">
+          <span class="${condColor(c.icon)} text-base mr-1.5" aria-hidden="true">${condGlyph(c.icon)}</span>
+          <span class="text-[var(--term-text)] text-[11.5px]">${c.condition}</span>
+        </td>
+        <td class="px-2 py-2 text-right tabular-nums ${tempColor(c.temp_c)} font-medium">
+          ${c.temp_c}<span class="text-[10px] text-[var(--term-text-dim)] ml-0.5">°C</span>
+        </td>
+        <td class="px-2 py-2 text-right tabular-nums hidden md:table-cell ${deltaColor(c.delta_temp_yesterday_c)}">
+          ${deltaSign(c.delta_temp_yesterday_c)}
+        </td>
+        <td class="px-2 py-2 text-right tabular-nums text-[var(--term-text)] hidden lg:table-cell">
+          ${c.humidity_pct}
+        </td>
+        <td class="px-2 py-2 text-right tabular-nums ${pmG.cls}">
+          ${c.pm25_ugm3}
+        </td>
+        <td class="px-2 py-2 text-right">
+          <div class="inline-flex flex-col items-end gap-1 min-w-[64px]">
+            <span class="tabular-nums ${k.cls}">${c.khai}</span>
+            <span class="bar-track w-12">
+              <span class="bar-fill" style="width:${fillPct.toFixed(1)}%; background:${k.solid};"></span>
+            </span>
+          </div>
+        </td>
+        <td class="px-2 py-2 text-right tabular-nums hidden md:table-cell ${precipColor(c.precip_prob_pct)}">
+          ${c.precip_prob_pct}
+        </td>
+        <td class="px-3 py-2 hidden lg:table-cell">
+          <span class="inline-flex items-center gap-1.5 text-[11px]">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:${k.solid};"></span>
+            <span class="${k.cls}">${k.label}</span>
+          </span>
+        </td>`;
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+
+  // ============== Sort buttons ==============
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.sort;
+      if (currentSort.key === key) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.key = key;
+        currentSort.dir = key === 'city' ? 'asc' : 'desc';
+      }
+      // visual update
+      document.querySelectorAll('.sort-btn').forEach(b => {
+        b.classList.toggle('text-[var(--term-cyan)]', b.dataset.sort === currentSort.key);
+        b.classList.toggle('border-[var(--term-cyan)]', b.dataset.sort === currentSort.key);
+      });
+      renderRows();
+    });
+  });
+  // Init highlight
+  document.querySelector('.sort-btn[data-sort="khai"]').classList.add('text-[var(--term-cyan)]','border-[var(--term-cyan)]');
+
+  renderRows();
+</script>
+</body>
+</html>

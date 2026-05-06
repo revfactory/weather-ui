@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>야외활동 적합도 · 서울 · 점수 78</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    /* Neumorphism palette */
+    --neu-bg: #e0e5ec;
+    --neu-bg-2: #d6dde6;
+    --neu-light: #ffffff;
+    --neu-shadow: #a3b1c6;
+    --neu-text: #2d3748;
+    --neu-text-soft: #4a5568;
+    --neu-text-mute: #718096;
+    /* Signal colors */
+    --sig-good: #059669;
+    --sig-good-soft: #10b981;
+    --sig-moderate: #0284c7;
+    --sig-caution: #d97706;
+    --sig-very-unhealthy: #dc2626;
+    --sig-good-bg: #d1fae5;
+    --sig-moderate-bg: #dbeafe;
+    --sig-caution-bg: #fef3c7;
+
+    --neu-out: 8px 8px 16px var(--neu-shadow), -8px -8px 16px var(--neu-light);
+    --neu-out-sm: 5px 5px 10px var(--neu-shadow), -5px -5px 10px var(--neu-light);
+    --neu-out-lg: 14px 14px 28px var(--neu-shadow), -14px -14px 28px var(--neu-light);
+    --neu-in: inset 4px 4px 8px var(--neu-shadow), inset -4px -4px 8px var(--neu-light);
+    --neu-in-sm: inset 2px 2px 4px var(--neu-shadow), inset -2px -2px 4px var(--neu-light);
+    --neu-in-deep: inset 6px 6px 12px var(--neu-shadow), inset -6px -6px 12px var(--neu-light);
+  }
+
+  html, body {
+    background: var(--neu-bg);
+    color: var(--neu-text);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum";
+    min-height: 100vh;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(255,255,255,0.6), transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(163, 177, 198, 0.18), transparent 40%);
+  }
+
+  .neu-out      { background: var(--neu-bg); box-shadow: var(--neu-out); }
+  .neu-out-sm   { background: var(--neu-bg); box-shadow: var(--neu-out-sm); }
+  .neu-out-lg   { background: var(--neu-bg); box-shadow: var(--neu-out-lg); }
+  .neu-in       { background: var(--neu-bg); box-shadow: var(--neu-in); }
+  .neu-in-sm    { background: var(--neu-bg); box-shadow: var(--neu-in-sm); }
+  .neu-in-deep  { background: var(--neu-bg); box-shadow: var(--neu-in-deep); }
+
+  .neu-btn {
+    background: var(--neu-bg);
+    box-shadow: var(--neu-out-sm);
+    transition: box-shadow 200ms ease, transform 100ms ease;
+    border-radius: 14px;
+  }
+  .neu-btn:hover { box-shadow: var(--neu-out); }
+  .neu-btn:active, .neu-btn[aria-pressed="true"] { box-shadow: var(--neu-in-sm); }
+
+  .neu-chip {
+    background: var(--neu-bg);
+    box-shadow: var(--neu-out-sm);
+    border-radius: 999px;
+    padding: 0.375rem 0.875rem;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--neu-text-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* 활동 진행 바 (음각 트랙 + 양각 채움 그라데이션) */
+  .progress-track {
+    background: var(--neu-bg);
+    box-shadow: var(--neu-in);
+    border-radius: 999px;
+    height: 16px;
+    overflow: visible;
+    position: relative;
+  }
+  .progress-fill {
+    position: absolute;
+    top: 2px; bottom: 2px; left: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--c-from), var(--c-to));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -1px 0 rgba(0,0,0,0.08),
+      0 1px 4px rgba(0,0,0,0.18);
+    transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 게이지 호 그리기 */
+  @keyframes draw-gauge {
+    from { stroke-dashoffset: 565.5; }
+  }
+  .gauge-anim {
+    animation: draw-gauge 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  /* 카운트업 fade */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fade-up 600ms ease-out 0.4s both; }
+
+  *:focus-visible {
+    outline: 2px solid var(--sig-moderate);
+    outline-offset: 3px;
+    border-radius: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main class="max-w-3xl mx-auto p-4 md:p-8">
+
+  <!-- 헤더 -->
+  <header class="flex items-center justify-between mb-6 md:mb-8">
+    <div class="flex items-center gap-3">
+      <div class="neu-out rounded-2xl w-11 h-11 flex items-center justify-center" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2 14 8h6l-5 4 2 8-7-5-7 5 2-8-5-4h6z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-stone-500">OUTDOOR ACTIVITY</p>
+        <h1 class="text-xl font-semibold text-stone-800">야외활동 적합도</h1>
+      </div>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-stone-500 tabular-nums">서울 · 15:24 KST</p>
+      <p class="text-[10px] text-stone-400">2026.05.06 수요일</p>
+    </div>
+  </header>
+
+  <!-- 메인 게이지 카드 -->
+  <section class="neu-out-lg rounded-[36px] p-7 md:p-10 text-center" aria-labelledby="score-heading">
+    <p id="score-heading" class="text-[11px] uppercase tracking-[0.2em] text-stone-500">Activity Score</p>
+
+    <!-- GaugeRing 큰 사이즈 -->
+    <div class="relative inline-block mt-2">
+      <svg viewBox="0 0 220 220" class="w-56 h-56 md:w-64 md:h-64" role="meter"
+           aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"
+           aria-label="야외활동 적합도 78점 좋음 등급">
+        <title>야외활동 적합도 · 78점 / 100점 · 좋음</title>
+
+        <defs>
+          <linearGradient id="gauge-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"  stop-color="#34d399"/>
+            <stop offset="50%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </linearGradient>
+          <filter id="gauge-shadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feOffset dx="0" dy="2" result="off"/>
+            <feMerge><feMergeNode in="off"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- 외곽 음각 트랙 (Neumorphism inset) -->
+        <circle cx="110" cy="110" r="92" fill="none"
+                stroke="#cdd5e0" stroke-width="2" opacity="0.7"/>
+        <circle cx="110" cy="110" r="92" fill="none"
+                stroke="#ffffff" stroke-width="1" opacity="0.9" stroke-dasharray="0 0" transform="rotate(-2 110 110)"/>
+
+        <!-- 트랙 (음각 효과 흉내: 어두운 → 밝은 그라데이션) -->
+        <circle cx="110" cy="110" r="90" fill="none"
+                stroke="#bcc6d4" stroke-width="14" stroke-opacity="0.55"/>
+
+        <!-- 채움 호 (78%) -->
+        <circle cx="110" cy="110" r="90" fill="none"
+                stroke="url(#gauge-grad)" stroke-width="14"
+                stroke-linecap="round"
+                stroke-dasharray="441 565.5"
+                stroke-dashoffset="0"
+                transform="rotate(-90 110 110)"
+                filter="url(#gauge-shadow)"
+                class="gauge-anim"
+                style="stroke-dasharray: calc(78 * 5.655) 565.5;">
+        </circle>
+
+        <!-- 내부 양각 디스크 (Neumorphism out 흉내) -->
+        <circle cx="110" cy="110" r="74" fill="#e0e5ec"/>
+        <circle cx="110" cy="110" r="74" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+        <circle cx="110" cy="110" r="74" fill="none" stroke="#a3b1c6" stroke-width="1" opacity="0.25" stroke-dasharray="0 0"/>
+
+        <!-- 0/100 마커 -->
+        <g font-family="Pretendard Variable, sans-serif" font-size="9" fill="#a3b1c6" text-anchor="middle" font-weight="500">
+          <text x="110" y="218">0</text>
+        </g>
+      </svg>
+
+      <!-- 중앙 숫자 -->
+      <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <p class="fade-up text-6xl md:text-7xl font-light tabular-nums text-emerald-700 leading-none">78</p>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-stone-400 mt-1">/ 100</p>
+        <span class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          좋음
+        </span>
+      </div>
+    </div>
+
+    <!-- 자연어 라벨 -->
+    <p class="mt-5 text-sm text-stone-600 max-w-md mx-auto">
+      야외활동 매우 적합 · 자외선 차단 권장
+    </p>
+    <p class="mt-1 text-xs text-stone-500">최적 시간대 <span class="font-semibold text-stone-700 tabular-nums">09:00 ~ 15:00</span></p>
+  </section>
+
+  <!-- 활동별 진행 바 -->
+  <section class="neu-out rounded-3xl p-5 md:p-7 mt-5 md:mt-6" aria-labelledby="acts-heading">
+    <header class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-stone-500">By Activity</p>
+        <h2 id="acts-heading" class="text-base font-semibold text-stone-800 mt-0.5">활동별 적합도</h2>
+      </div>
+      <!-- 토글 -->
+      <div role="group" aria-label="시간대 필터" class="inline-flex gap-2">
+        <button type="button" class="neu-btn px-3 py-1.5 text-[11px] text-stone-700" aria-pressed="true">지금</button>
+        <button type="button" class="neu-btn px-3 py-1.5 text-[11px] text-stone-500" aria-pressed="false">오늘 평균</button>
+      </div>
+    </header>
+
+    <ul id="activities-list" class="space-y-4"></ul>
+  </section>
+
+  <!-- 산출 근거 (factor cells) -->
+  <section class="neu-out rounded-3xl p-5 md:p-7 mt-5 md:mt-6" aria-labelledby="factors-heading">
+    <header class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-stone-500">Score Factors</p>
+        <h2 id="factors-heading" class="text-base font-semibold text-stone-800 mt-0.5">산출 근거</h2>
+      </div>
+      <span class="text-[11px] text-stone-500">합성 지표 5개</span>
+    </header>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+      <article class="neu-in rounded-2xl p-4 text-center" role="group" aria-label="체감 온도">
+        <div class="w-9 h-9 mx-auto neu-out rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 1 1 4 0z"/></svg>
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-2">체감</p>
+        <p class="text-xl font-light tabular-nums text-stone-800 mt-0.5">21.8<span class="text-xs text-stone-400 ml-0.5">°C</span></p>
+        <p class="text-[10px] text-emerald-700 font-medium mt-0.5">쾌적</p>
+      </article>
+      <article class="neu-in rounded-2xl p-4 text-center" role="group" aria-label="UV 인덱스">
+        <div class="w-9 h-9 mx-auto neu-out rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-2">UV</p>
+        <p class="text-xl font-light tabular-nums text-stone-800 mt-0.5">6</p>
+        <p class="text-[10px] text-orange-600 font-medium mt-0.5">높음</p>
+      </article>
+      <article class="neu-in rounded-2xl p-4 text-center" role="group" aria-label="풍속">
+        <div class="w-9 h-9 mx-auto neu-out rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5a3 3 0 1 1 3 3H2"/><path d="M14 8a3 3 0 1 0 3 3H2"/><path d="M16 17a3 3 0 1 1 3 3H2"/></svg>
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-2">풍속</p>
+        <p class="text-xl font-light tabular-nums text-stone-800 mt-0.5">2.4<span class="text-xs text-stone-400 ml-0.5">m/s</span></p>
+        <p class="text-[10px] text-emerald-700 font-medium mt-0.5">약함</p>
+      </article>
+      <article class="neu-in rounded-2xl p-4 text-center" role="group" aria-label="강수확률">
+        <div class="w-9 h-9 mx-auto neu-out rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 12a7 7 0 0 1 14 0c0 4-3 6-7 12-4-6-7-8-7-12z"/></svg>
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-2">강수</p>
+        <p class="text-xl font-light tabular-nums text-stone-800 mt-0.5">20<span class="text-xs text-stone-400 ml-0.5">%</span></p>
+        <p class="text-[10px] text-emerald-700 font-medium mt-0.5">낮음</p>
+      </article>
+      <article class="neu-in rounded-2xl p-4 text-center" role="group" aria-label="초미세먼지">
+        <div class="w-9 h-9 mx-auto neu-out rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="9" cy="14" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+        </div>
+        <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-2">PM2.5</p>
+        <p class="text-xl font-light tabular-nums text-stone-800 mt-0.5">28<span class="text-xs text-stone-400 ml-0.5">㎍/㎥</span></p>
+        <p class="text-[10px] text-sky-700 font-medium mt-0.5">보통</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Best Window 추천 -->
+  <section class="neu-out rounded-3xl p-5 md:p-7 mt-5 md:mt-6">
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-stone-500">Best Window</p>
+        <h3 class="text-base font-semibold text-stone-800 mt-0.5">시간대별 추천</h3>
+      </div>
+      <div class="neu-chip text-emerald-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        오전 9시~오후 3시 최적
+      </div>
+    </div>
+
+    <!-- 시간대 막대 (24시간 단순화: 6시~21시) -->
+    <div class="mt-5">
+      <div class="grid grid-cols-16 gap-1" id="hour-bars" style="grid-template-columns: repeat(16, minmax(0, 1fr));"></div>
+      <div class="mt-2 flex justify-between text-[10px] text-stone-500 tabular-nums">
+        <span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 푸터 -->
+  <footer class="mt-6 flex items-center justify-between text-[11px] text-stone-500 flex-wrap gap-2">
+    <span>합성 지표 · 체감·UV·풍속·강수·미세먼지 (5인자 가중)</span>
+    <span class="tabular-nums">갱신 15:00 KST</span>
+  </footer>
+
+</main>
+
+<script>
+  // ============ 더미 데이터 (outdoor_activity) ============
+  const ACT = {
+    activity_score: 78,
+    activities: [
+      { key: "running", label: "러닝",   icon: "run",     score: 90, grade: "최적" },
+      { key: "hiking",  label: "등산",   icon: "hike",    score: 78, grade: "좋음" },
+      { key: "golf",    label: "골프",   icon: "golf",    score: 65, grade: "보통" },
+      { key: "camping", label: "캠핑",   icon: "tent",    score: 80, grade: "좋음" },
+      { key: "cycling", label: "자전거", icon: "bike",    score: 75, grade: "좋음" }
+    ]
+  };
+
+  // 시간대별 점수 (06~21시)
+  const HOURS = [
+    { h:  6, score: 70 }, { h:  7, score: 76 }, { h:  8, score: 82 },
+    { h:  9, score: 88 }, { h: 10, score: 92 }, { h: 11, score: 90 },
+    { h: 12, score: 85 }, { h: 13, score: 84 }, { h: 14, score: 82 },
+    { h: 15, score: 78, isNow: true }, { h: 16, score: 72 },
+    { h: 17, score: 64 }, { h: 18, score: 52 }, { h: 19, score: 40 },
+    { h: 20, score: 32 }, { h: 21, score: 28 }
+  ];
+
+  // 활동 아이콘 SVG
+  const ACT_ICONS = {
+    run: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="m18 15 -3-2 1-4-3-1-3 4 3 4 -1 6"/><path d="M9 9 5 11l1 4"/><path d="M14 18 11 22"/></svg>`,
+    hike: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 8 12l5 6 8-12"/><circle cx="13" cy="3" r="1.5"/></svg>`,
+    golf: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V3l6 4-6 4"/><circle cx="12" cy="20" r="2"/></svg>`,
+    tent: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 21 12 6 20.5 21z"/><path d="M12 6v15"/><path d="M9 21h6"/></svg>`,
+    bike: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="m9 17 3-7 4 5h-7M14 6l4 0 -2 4"/></svg>`
+  };
+
+  // 점수 → 색상 토큰
+  function scoreColor(score) {
+    if (score >= 80) return { from: '#34d399', to: '#059669', text: '#065f46', label: '최적', tone: 'good' };
+    if (score >= 60) return { from: '#38bdf8', to: '#0284c7', text: '#075985', label: '좋음', tone: 'moderate' };
+    if (score >= 40) return { from: '#fbbf24', to: '#d97706', text: '#92400e', label: '보통', tone: 'caution' };
+    return { from: '#f87171', to: '#dc2626', text: '#991b1b', label: '주의', tone: 'unhealthy' };
+  }
+
+  // ============ 활동별 진행 바 ============
+  function renderActivities() {
+    const list = document.getElementById('activities-list');
+    list.innerHTML = ACT.activities.map(a => {
+      const c = scoreColor(a.score);
+      const grade = a.score >= 80 ? '최적' : a.score >= 60 ? '좋음' : a.score >= 40 ? '보통' : '주의';
+      return `
+        <li role="group" aria-label="${a.label} ${a.score}점 ${grade}">
+          <div class="flex items-center gap-3 md:gap-4">
+            <!-- 아이콘 (양각) -->
+            <div class="neu-out-sm rounded-2xl w-12 h-12 md:w-14 md:h-14 flex-none flex items-center justify-center" style="color:${c.text}" aria-hidden="true">
+              <span class="block w-5 h-5 md:w-6 md:h-6">${ACT_ICONS[a.icon]}</span>
+            </div>
+            <!-- 본문 -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-baseline justify-between gap-2 mb-1.5">
+                <p class="text-sm font-semibold text-stone-800">${a.label}</p>
+                <p class="text-xs text-stone-500">
+                  <span class="font-semibold tabular-nums" style="color:${c.text}">${a.score}</span>
+                  <span class="text-stone-400">/100</span>
+                  <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold" style="background:rgba(0,0,0,0); border:1px solid ${c.text}33; color:${c.text};">${grade}</span>
+                </p>
+              </div>
+              <div class="progress-track" role="progressbar" aria-valuenow="${a.score}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill" style="--c-from:${c.from}; --c-to:${c.to}; width: calc(${a.score}% - 4px);"></div>
+              </div>
+            </div>
+          </div>
+        </li>`;
+    }).join('');
+  }
+
+  // ============ 시간대 막대 ============
+  function renderHourBars() {
+    const wrap = document.getElementById('hour-bars');
+    wrap.innerHTML = HOURS.map(h => {
+      const c = scoreColor(h.score);
+      const heightPct = h.score; // 0~100 직접 매핑
+      const ringStyle = h.isNow ? 'box-shadow: var(--neu-in-deep), 0 0 0 2px #059669;' : '';
+      return `
+        <div class="neu-in rounded-xl flex flex-col items-center justify-end gap-1 p-1.5 h-24 relative overflow-hidden ${h.isNow ? 'is-now' : ''}"
+             style="${ringStyle}"
+             role="img"
+             aria-label="${h.h}시 활동 점수 ${h.score}점">
+          <div class="w-full rounded-md" style="background: linear-gradient(180deg, ${c.from}, ${c.to}); height: ${heightPct * 0.65}%; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);"></div>
+          ${h.isNow ? `<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-500"></span>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderActivities();
+    renderHourBars();
+  });
+</script>
+
+</body>
+</html>

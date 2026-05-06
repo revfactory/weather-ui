@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>여행지 날씨 다이어리 — Paper</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-family/[email protected]/web/static/NanumPenScript-Regular.css" onerror="this.remove()">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {
+      fontFamily: {
+        sans: ['"Pretendard Variable"','Pretendard','-apple-system','system-ui','sans-serif'],
+        hand: ['"Caveat"','"Nanum Pen Script"','"Pretendard"','cursive'],
+        serif: ['"Noto Serif KR"','"Nanum Myeongjo"','Georgia','serif']
+      }
+    } }
+  };
+</script>
+<style>
+  :root {
+    --paper:#fdf6e3;
+    --paper-2:#f5edd9;
+    --ink:#3b2f1c;
+    --ink-soft:#6b5c44;
+    --ink-faint:#a08c6c;
+    --rule:#e6d9b8;
+    --tape:#fde68a;
+    --tape-2:#bae6fd;
+    --tape-3:#fbcfe8;
+    --focus-ring:#9a3412;
+
+    --w-clear:#f59e0b;
+    --w-partly:#38bdf8;
+    --w-cloudy:#64748b;
+    --w-rain:#0ea5e9;
+    --w-rain-heavy:#1d4ed8;
+    --w-heat:#dc2626;
+
+    --good:#15803d;
+    --moderate:#0369a1;
+    --caution:#b45309;
+    --warning:#c2410c;
+    --danger:#b91c1c;
+  }
+  body {
+    font-family: "Pretendard Variable","Pretendard",-apple-system,system-ui,sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(245,158,11,.08), transparent 30%),
+      radial-gradient(circle at 100% 100%, rgba(180,83,9,.07), transparent 30%),
+      radial-gradient(#e7d8b1 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 22px 22px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .font-hand { font-family: 'Caveat','Nanum Pen Script','Pretendard',cursive; }
+
+  /* Paper card with subtle shadow */
+  .paper-card {
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.7) inset,
+      0 1px 2px rgba(60,40,12,.08),
+      0 12px 24px -12px rgba(60,40,12,.18);
+    border: 1px solid #f0e6c8;
+    position: relative;
+  }
+  .paper-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(146,107,40,.045) 1px, transparent 1px);
+    background-size: 8px 8px;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  .tape {
+    position: absolute;
+    width: 64px; height: 18px;
+    background: var(--tape);
+    opacity: .85;
+    box-shadow: 0 2px 4px rgba(60,40,12,.15);
+    transform: rotate(-3deg);
+  }
+  .tape-edge {
+    background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.04) 0 4px, transparent 4px 7px);
+  }
+
+  /* Stamp */
+  .stamp {
+    border: 2px solid currentColor;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Caveat','Nanum Pen Script','Pretendard',cursive;
+    color: currentColor;
+    transform: rotate(-9deg);
+    font-weight: 700;
+    letter-spacing: .04em;
+    line-height: 1;
+    position: relative;
+  }
+  .stamp::before {
+    content: '';
+    position: absolute; inset: -2px;
+    border: 2px solid currentColor;
+    border-radius: 8px;
+    opacity: .25;
+    transform: rotate(2deg);
+  }
+  .stamp-circle {
+    width: 84px; height: 84px;
+    border: 2.5px solid currentColor;
+    border-radius: 9999px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transform: rotate(-12deg);
+    opacity: .82;
+    color: currentColor;
+    text-align: center;
+    line-height: 1.05;
+  }
+  .stamp-circle::before {
+    content: '';
+    position: absolute;
+    width: 76px; height: 76px;
+    border: 1.5px dashed currentColor;
+    border-radius: 9999px;
+    opacity: .55;
+  }
+
+  /* Rotation utility classes */
+  .rot-l1 { transform: rotate(-1.4deg); }
+  .rot-l2 { transform: rotate(-0.7deg); }
+  .rot-r1 { transform: rotate(1.1deg); }
+  .rot-r2 { transform: rotate(0.6deg); }
+
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+  <!-- Header (notebook style) -->
+  <header class="mb-7 sm:mb-9 text-center relative">
+    <p class="text-xs uppercase tracking-[0.4em] text-[var(--ink-faint)]">My Travel Weather Diary</p>
+    <h1 class="mt-2 font-hand text-5xl sm:text-6xl text-[var(--ink)] leading-none">
+      여행지 날씨 다이어리
+    </h1>
+    <div class="mt-3 inline-flex items-center gap-3 text-sm text-[var(--ink-soft)]">
+      <span class="font-hand text-2xl">2026 · 05 · 06</span>
+      <span class="text-[var(--ink-faint)]">·</span>
+      <span class="tabular-nums">수요일 · KST 15:24</span>
+    </div>
+    <!-- Decorative ribbon -->
+    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-32 h-2 rounded-full opacity-60 hidden sm:block"
+         style="background:linear-gradient(90deg,#fde68a,#fdba74,#f9a8d4);"></div>
+  </header>
+
+  <!-- 6 city cards grid -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 mb-8" aria-label="여행지 6곳 카드">
+
+    <!-- Card 1: 서울 (KR) -->
+    <article class="paper-card p-5 rot-l1 relative" aria-label="서울 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; left:18%;"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">KR · 대한민국</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">서울</h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">37.57°N 126.98°E</p>
+        </div>
+        <!-- Cond icon partly_cloudy -->
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="부분 흐림">
+          <circle cx="18" cy="18" r="8" fill="var(--w-clear)"/>
+          <g stroke="var(--w-clear)" stroke-width="1.6" stroke-linecap="round" opacity=".7">
+            <line x1="18" y1="4" x2="18" y2="7"/>
+            <line x1="4" y1="18" x2="7" y2="18"/>
+            <line x1="9" y1="9" x2="11" y2="11"/>
+            <line x1="27" y1="9" x2="25" y2="11"/>
+          </g>
+          <path d="M14 32c0-3 2.5-5 5.6-5 2.3 0 4.2 1.4 5 3.5 2.4.3 4.2 1.9 4.2 3.9 0 2.2-1.9 3.6-4.5 3.6H14c-2.5 0-4.3-1.5-4.3-3.4 0-1.8 1.5-3.3 4.3-3.6z" fill="var(--w-cloudy)" opacity=".9"/>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--ink)] leading-none">
+        22<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--ink-soft)]">부분 흐림 · 오후 늦게 비</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--ink)] mt-0.5">20%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--ink)] mt-0.5">6</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">PM<sub>2.5</sub></dt><dd class="text-[var(--ink)] mt-0.5">28</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--moderate)]">"가벼운 외투 챙기기"</p>
+
+      <!-- Stamp -->
+      <span class="absolute bottom-3 right-3 stamp text-[10px]" style="color:var(--moderate);">SEOUL · KR</span>
+    </article>
+
+    <!-- Card 2: 부산 (KR) -->
+    <article class="paper-card p-5 rot-r1 relative" aria-label="부산 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; right:18%; background:var(--tape-2); transform:rotate(4deg);"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">KR · 대한민국</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">부산</h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">35.18°N 129.07°E</p>
+        </div>
+        <!-- clear -->
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="맑음">
+          <circle cx="24" cy="24" r="9" fill="var(--w-clear)"/>
+          <g stroke="var(--w-clear)" stroke-width="1.8" stroke-linecap="round">
+            <line x1="24" y1="4" x2="24" y2="9"/>
+            <line x1="24" y1="39" x2="24" y2="44"/>
+            <line x1="4" y1="24" x2="9" y2="24"/>
+            <line x1="39" y1="24" x2="44" y2="24"/>
+            <line x1="10" y1="10" x2="14" y2="14"/>
+            <line x1="34" y1="34" x2="38" y2="38"/>
+            <line x1="10" y1="38" x2="14" y2="34"/>
+            <line x1="34" y1="14" x2="38" y2="10"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--ink)] leading-none">
+        24<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--ink-soft)]">맑음 · 바람 산뜻</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--ink)] mt-0.5">15%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--ink)] mt-0.5">7</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">PM<sub>2.5</sub></dt><dd class="text-[var(--ink)] mt-0.5">18</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--good)]">"선크림 잊지 말기"</p>
+
+      <span class="absolute bottom-3 right-3 stamp text-[10px]" style="color:var(--good);">BUSAN · KR</span>
+    </article>
+
+    <!-- Card 3: 제주 (KR) - rain -->
+    <article class="paper-card p-5 rot-l2 relative" aria-label="제주 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; left:46%; background:var(--tape-3); transform:rotate(-2deg);"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">KR · 대한민국</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">제주</h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">33.49°N 126.50°E</p>
+        </div>
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="비">
+          <path d="M11 24c0-3.5 3-6 6.6-6 2.7 0 5 1.6 5.9 4 2.8.3 4.9 2.2 4.9 4.6 0 2.6-2.2 4.3-5.3 4.3H11c-2.9 0-5-1.8-5-4 0-2.1 1.8-3.9 5-4.3z" fill="var(--w-cloudy)" opacity=".7"/>
+          <g stroke="var(--w-rain)" stroke-width="2" stroke-linecap="round">
+            <line x1="14" y1="36" x2="12" y2="44"/>
+            <line x1="20" y1="36" x2="18" y2="44"/>
+            <line x1="26" y1="36" x2="24" y2="44"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--ink)] leading-none">
+        21<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--ink-soft)]">비 · 종일 우산</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--warning)] mt-0.5 font-semibold">70%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--ink)] mt-0.5">4</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">PM<sub>2.5</sub></dt><dd class="text-[var(--good)] mt-0.5 font-semibold">14</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--warning)]">"우산 필수, 카페 추천"</p>
+
+      <span class="absolute bottom-3 right-3 stamp text-[10px]" style="color:var(--warning);">JEJU · KR</span>
+    </article>
+
+    <!-- Card 4: 도쿄 (JP) -->
+    <article class="paper-card p-5 rot-r2 relative" aria-label="도쿄 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; right:30%;"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">JP · 일본</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">도쿄 <span class="text-[10px] text-[var(--ink-faint)] font-normal align-middle">東京</span></h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">35.68°N 139.69°E · +0h KST</p>
+        </div>
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="구름조금">
+          <circle cx="18" cy="18" r="7" fill="var(--w-clear)"/>
+          <g stroke="var(--w-clear)" stroke-width="1.4" stroke-linecap="round" opacity=".6">
+            <line x1="18" y1="6" x2="18" y2="9"/>
+            <line x1="6" y1="18" x2="9" y2="18"/>
+          </g>
+          <path d="M16 30c0-3 2.5-5 5.6-5 2.3 0 4.2 1.4 5 3.5 2.4.3 4.2 1.9 4.2 3.9 0 2.2-1.9 3.6-4.5 3.6H16c-2.5 0-4.3-1.5-4.3-3.4 0-1.8 1.5-3.3 4.3-3.6z" fill="var(--w-cloudy)" opacity=".95"/>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--ink)] leading-none">
+        21<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--ink-soft)]">구름조금 · 산책 좋음</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--ink)] mt-0.5">30%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--ink)] mt-0.5">6</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">시차</dt><dd class="text-[var(--ink)] mt-0.5">±0h</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--moderate)]">"가벼운 겉옷 챙기기"</p>
+
+      <span class="absolute bottom-3 right-3 stamp text-[10px]" style="color:var(--moderate);">TOKYO · JP</span>
+    </article>
+
+    <!-- Card 5: 방콕 (TH) - hot -->
+    <article class="paper-card p-5 rot-l1 relative" aria-label="방콕 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; left:24%; background:#fda4af; transform:rotate(-4deg);"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">TH · 태국</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">방콕 <span class="text-[10px] text-[var(--ink-faint)] font-normal align-middle">กรุงเทพ</span></h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">13.75°N 100.50°E · −2h KST</p>
+        </div>
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="맑음 · 더움">
+          <circle cx="24" cy="24" r="10" fill="var(--w-heat)"/>
+          <g stroke="var(--w-heat)" stroke-width="2" stroke-linecap="round">
+            <line x1="24" y1="3" x2="24" y2="9"/>
+            <line x1="24" y1="39" x2="24" y2="45"/>
+            <line x1="3" y1="24" x2="9" y2="24"/>
+            <line x1="39" y1="24" x2="45" y2="24"/>
+            <line x1="9" y1="9" x2="13" y2="13"/>
+            <line x1="35" y1="35" x2="39" y2="39"/>
+            <line x1="9" y1="39" x2="13" y2="35"/>
+            <line x1="35" y1="13" x2="39" y2="9"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--w-heat)] leading-none">
+        33<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--danger)] font-medium">폭염 · 자외선 위험</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--ink)] mt-0.5">20%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--danger)] mt-0.5 font-semibold">11+</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">시차</dt><dd class="text-[var(--ink)] mt-0.5">−2h</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--danger)]">"한낮 외출 자제 · 수분"</p>
+
+      <span class="absolute bottom-3 right-3 stamp-circle text-[10px]" style="color:var(--danger);">
+        <span class="font-bold text-[11px]">BKK</span>
+        <span class="text-[8px] tracking-widest">THAILAND</span>
+      </span>
+    </article>
+
+    <!-- Card 6: 파리 (FR) -->
+    <article class="paper-card p-5 rot-r1 relative" aria-label="파리 날씨 카드">
+      <span class="tape tape-edge" style="top:-9px; right:22%; background:var(--tape-2); transform:rotate(3deg);"></span>
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">FR · 프랑스</p>
+          <h2 class="font-serif text-2xl font-bold text-[var(--ink)] mt-0.5">파리 <span class="text-[10px] text-[var(--ink-faint)] font-normal align-middle">Paris</span></h2>
+          <p class="text-[11px] text-[var(--ink-faint)] tabular-nums">48.86°N 2.35°E · −7h KST</p>
+        </div>
+        <svg viewBox="0 0 48 48" class="w-12 h-12 shrink-0" role="img" aria-label="흐림">
+          <path d="M11 26c0-4 3.2-6.5 7.2-6.5 3 0 5.5 1.8 6.5 4.4 2.9.3 5.3 2.4 5.3 5 0 2.8-2.4 4.6-5.7 4.6H11c-3.1 0-5.4-2-5.4-4.4 0-2.3 1.8-4.2 5.4-4.6z" fill="var(--w-cloudy)"/>
+          <path d="M16 19c0-2.5 2-4 4.4-4 1.9 0 3.4 1.1 4 2.7 1.7.2 3.1 1.4 3.1 2.9" fill="none" stroke="var(--w-cloudy)" stroke-width="1.4" opacity=".5"/>
+        </svg>
+      </div>
+
+      <p class="mt-2 text-6xl font-light tabular-nums text-[var(--ink)] leading-none">
+        15<span class="text-2xl text-[var(--ink-faint)] align-top">°</span>
+      </p>
+      <p class="mt-1 text-sm text-[var(--ink-soft)]">흐림 · 쌀쌀함</p>
+
+      <hr class="my-3 border-dashed border-[var(--rule)]">
+      <dl class="grid grid-cols-3 gap-2 text-[11px] tabular-nums">
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">강수</dt><dd class="text-[var(--ink)] mt-0.5">35%</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">UV</dt><dd class="text-[var(--ink)] mt-0.5">3</dd></div>
+        <div><dt class="text-[var(--ink-faint)] uppercase tracking-wider text-[10px]">시차</dt><dd class="text-[var(--ink)] mt-0.5">−7h</dd></div>
+      </dl>
+      <p class="mt-3 font-hand text-xl text-[var(--moderate)]">"트렌치코트 데이"</p>
+
+      <span class="absolute bottom-3 right-3 stamp-circle text-[10px]" style="color:var(--moderate);">
+        <span class="font-bold text-[11px]">PAR</span>
+        <span class="text-[8px] tracking-widest">FRANCE</span>
+      </span>
+    </article>
+  </section>
+
+  <!-- Mini comparison row -->
+  <section class="paper-card p-5 sm:p-6 rot-l2" aria-label="여행 적합도 미니 비교 표">
+    <span class="tape tape-edge" style="top:-9px; left:50%; transform:translateX(-50%) rotate(2deg);"></span>
+    <div class="flex items-end justify-between mb-3 flex-wrap gap-2">
+      <div>
+        <p class="font-hand text-3xl text-[var(--ink)]">여행 적합도 한눈에</p>
+        <p class="text-xs text-[var(--ink-faint)] tabular-nums">기온 · 강수 · UV · PM 종합 판단</p>
+      </div>
+      <span class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">5월 6일 기준</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" role="table">
+        <thead class="text-[10px] uppercase tracking-widest text-[var(--ink-faint)]">
+          <tr class="border-b-2 border-dashed border-[var(--rule)]">
+            <th scope="col" class="text-left font-medium px-2 py-2">도시</th>
+            <th scope="col" class="text-right font-medium px-2 py-2 tabular-nums">기온</th>
+            <th scope="col" class="text-right font-medium px-2 py-2 hidden sm:table-cell tabular-nums">강수</th>
+            <th scope="col" class="text-right font-medium px-2 py-2 hidden sm:table-cell tabular-nums">UV</th>
+            <th scope="col" class="text-left font-medium px-2 py-2">상태</th>
+            <th scope="col" class="text-left font-medium px-2 py-2">팁</th>
+            <th scope="col" class="text-right font-medium px-2 py-2 hidden md:table-cell">적합도</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-dashed divide-[var(--rule)]">
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">서울</td>
+            <td class="px-2 py-2.5 text-right tabular-nums">22°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">20%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">6</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--moderate);"></span><span class="text-[var(--moderate)]">보통</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">가벼운 외투</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--moderate)]">★★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★★</span>
+            </td>
+          </tr>
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">부산</td>
+            <td class="px-2 py-2.5 text-right tabular-nums">24°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">15%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">7</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--good);"></span><span class="text-[var(--good)]">좋음</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">선크림 권장</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--good)]">★★★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★</span>
+            </td>
+          </tr>
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">제주</td>
+            <td class="px-2 py-2.5 text-right tabular-nums">21°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell text-[var(--warning)] font-medium">70%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">4</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--caution);"></span><span class="text-[var(--caution)]">보통</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">우산 필수</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--caution)]">★★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★★</span>
+            </td>
+          </tr>
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">도쿄</td>
+            <td class="px-2 py-2.5 text-right tabular-nums">21°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">30%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">6</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--good);"></span><span class="text-[var(--good)]">좋음</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">겉옷 챙기기</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--good)]">★★★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★</span>
+            </td>
+          </tr>
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">방콕</td>
+            <td class="px-2 py-2.5 text-right tabular-nums text-[var(--w-heat)] font-semibold">33°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">20%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell text-[var(--danger)] font-semibold">11+</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--danger);"></span><span class="text-[var(--danger)]">주의</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">폭염 · 자외선</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--danger)]">★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★★★</span>
+            </td>
+          </tr>
+          <tr class="hover:bg-[var(--paper-2)]/50">
+            <td class="px-2 py-2.5 font-serif font-semibold">파리</td>
+            <td class="px-2 py-2.5 text-right tabular-nums">15°</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">35%</td>
+            <td class="px-2 py-2.5 text-right tabular-nums hidden sm:table-cell">3</td>
+            <td class="px-2 py-2.5"><span class="inline-flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--moderate);"></span><span class="text-[var(--moderate)]">보통</span></span></td>
+            <td class="px-2 py-2.5 font-hand text-base text-[var(--ink-soft)]">트렌치 추천</td>
+            <td class="px-2 py-2.5 text-right hidden md:table-cell">
+              <span class="font-hand text-2xl text-[var(--moderate)]">★★★</span><span class="font-hand text-2xl text-[var(--ink-faint)]">★★</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="mt-7 text-center text-[11px] text-[var(--ink-faint)]">
+    <span class="font-hand text-base">Bon Voyage!</span><br>
+    출처: 기상청 · OpenWeatherMap · UI=paper-card · 2026-05-06
+  </footer>
+</main>
+
+</body>
+</html>

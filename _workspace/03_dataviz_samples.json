@@ -1,0 +1,490 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T15:30:00+09:00",
+    "season": "초여름",
+    "base_city": "서울",
+    "timezone": "Asia/Seoul",
+    "schema_version": "1.0.0",
+    "notes": "5월 초 한국 기상청 평년 기준 현실값. 모든 단위는 키명에 명시(_c, _ms, _mm, _ugm3, _ppm, _hpa, _km, _m, _min, _pct, _deg)."
+  },
+
+  "current": {
+    "city": "서울",
+    "city_en": "Seoul",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "temp_c": 22.4,
+    "feels_like_c": 21.8,
+    "condition": "부분 흐림",
+    "condition_en": "partly_cloudy",
+    "icon_key": "partly_cloudy",
+    "humidity_pct": 58,
+    "pressure_hpa": 1014,
+    "visibility_km": 18,
+    "dewpoint_c": 13.2,
+    "wind_ms": 2.4,
+    "wind_dir_deg": 235,
+    "wind_dir_label": "남서",
+    "wind_gust_ms": 4.6,
+    "precip_prob_pct": 20,
+    "uv_index": 6,
+    "uv_label": "높음",
+    "pm25_ugm3": 28,
+    "pm25_grade": "보통",
+    "pm10_ugm3": 48,
+    "pm10_grade": "보통",
+    "o3_ppm": 0.045,
+    "no2_ppm": 0.022,
+    "so2_ppm": 0.004,
+    "co_ppm": 0.4,
+    "khai": 92,
+    "khai_grade": "보통",
+    "sunrise": "05:38",
+    "sunset": "19:24",
+    "natural_label": "선선함, 가벼운 외투 권장"
+  },
+
+  "current_busan": {
+    "city": "부산",
+    "city_en": "Busan",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "temp_c": 24.1,
+    "feels_like_c": 24.5,
+    "condition": "맑음",
+    "condition_en": "clear",
+    "icon_key": "clear",
+    "humidity_pct": 70,
+    "pressure_hpa": 1015,
+    "visibility_km": 22,
+    "dewpoint_c": 18.0,
+    "wind_ms": 4.2,
+    "wind_dir_deg": 195,
+    "wind_dir_label": "남남서",
+    "wind_gust_ms": 6.8,
+    "precip_prob_pct": 15,
+    "uv_index": 7,
+    "uv_label": "높음",
+    "pm25_ugm3": 18,
+    "pm25_grade": "보통",
+    "pm10_ugm3": 32,
+    "pm10_grade": "좋음",
+    "khai": 56,
+    "khai_grade": "보통",
+    "sunrise": "05:25",
+    "sunset": "19:13"
+  },
+
+  "hourly_24h": [
+    { "hour": "15", "iso": "2026-05-06T15:00:00+09:00", "temp_c": 22.4, "precip_prob_pct": 20, "icon": "partly_cloudy", "wind_ms": 2.4, "humidity_pct": 58, "feels_like_c": 21.8 },
+    { "hour": "16", "iso": "2026-05-06T16:00:00+09:00", "temp_c": 22.7, "precip_prob_pct": 15, "icon": "partly_cloudy", "wind_ms": 2.6, "humidity_pct": 56, "feels_like_c": 22.1 },
+    { "hour": "17", "iso": "2026-05-06T17:00:00+09:00", "temp_c": 22.1, "precip_prob_pct": 25, "icon": "partly_cloudy", "wind_ms": 2.8, "humidity_pct": 60, "feels_like_c": 21.5 },
+    { "hour": "18", "iso": "2026-05-06T18:00:00+09:00", "temp_c": 20.6, "precip_prob_pct": 35, "icon": "cloudy",        "wind_ms": 3.0, "humidity_pct": 64, "feels_like_c": 20.1 },
+    { "hour": "19", "iso": "2026-05-06T19:00:00+09:00", "temp_c": 18.9, "precip_prob_pct": 50, "icon": "cloudy",        "wind_ms": 3.2, "humidity_pct": 70, "feels_like_c": 18.4 },
+    { "hour": "20", "iso": "2026-05-06T20:00:00+09:00", "temp_c": 17.8, "precip_prob_pct": 70, "icon": "rain",          "wind_ms": 3.4, "humidity_pct": 78, "feels_like_c": 17.2 },
+    { "hour": "21", "iso": "2026-05-06T21:00:00+09:00", "temp_c": 16.9, "precip_prob_pct": 80, "icon": "rain",          "wind_ms": 3.6, "humidity_pct": 82, "feels_like_c": 16.3 },
+    { "hour": "22", "iso": "2026-05-06T22:00:00+09:00", "temp_c": 16.2, "precip_prob_pct": 75, "icon": "rain",          "wind_ms": 3.5, "humidity_pct": 84, "feels_like_c": 15.6 },
+    { "hour": "23", "iso": "2026-05-06T23:00:00+09:00", "temp_c": 15.6, "precip_prob_pct": 60, "icon": "rain",          "wind_ms": 3.2, "humidity_pct": 85, "feels_like_c": 15.0 },
+    { "hour": "00", "iso": "2026-05-07T00:00:00+09:00", "temp_c": 15.1, "precip_prob_pct": 45, "icon": "cloudy",        "wind_ms": 2.9, "humidity_pct": 86, "feels_like_c": 14.5 },
+    { "hour": "01", "iso": "2026-05-07T01:00:00+09:00", "temp_c": 14.7, "precip_prob_pct": 35, "icon": "cloudy",        "wind_ms": 2.6, "humidity_pct": 86, "feels_like_c": 14.1 },
+    { "hour": "02", "iso": "2026-05-07T02:00:00+09:00", "temp_c": 14.3, "precip_prob_pct": 25, "icon": "cloudy",        "wind_ms": 2.4, "humidity_pct": 87, "feels_like_c": 13.7 },
+    { "hour": "03", "iso": "2026-05-07T03:00:00+09:00", "temp_c": 13.9, "precip_prob_pct": 20, "icon": "night_clear",   "wind_ms": 2.2, "humidity_pct": 87, "feels_like_c": 13.3 },
+    { "hour": "04", "iso": "2026-05-07T04:00:00+09:00", "temp_c": 13.6, "precip_prob_pct": 15, "icon": "night_clear",   "wind_ms": 2.0, "humidity_pct": 88, "feels_like_c": 13.0 },
+    { "hour": "05", "iso": "2026-05-07T05:00:00+09:00", "temp_c": 13.4, "precip_prob_pct": 10, "icon": "night_clear",   "wind_ms": 1.9, "humidity_pct": 88, "feels_like_c": 12.8 },
+    { "hour": "06", "iso": "2026-05-07T06:00:00+09:00", "temp_c": 13.8, "precip_prob_pct": 10, "icon": "clear",         "wind_ms": 2.0, "humidity_pct": 84, "feels_like_c": 13.2 },
+    { "hour": "07", "iso": "2026-05-07T07:00:00+09:00", "temp_c": 15.2, "precip_prob_pct": 10, "icon": "clear",         "wind_ms": 2.2, "humidity_pct": 78, "feels_like_c": 14.8 },
+    { "hour": "08", "iso": "2026-05-07T08:00:00+09:00", "temp_c": 17.1, "precip_prob_pct": 10, "icon": "clear",         "wind_ms": 2.5, "humidity_pct": 70, "feels_like_c": 16.8 },
+    { "hour": "09", "iso": "2026-05-07T09:00:00+09:00", "temp_c": 19.4, "precip_prob_pct": 10, "icon": "clear",         "wind_ms": 2.8, "humidity_pct": 62, "feels_like_c": 19.0 },
+    { "hour": "10", "iso": "2026-05-07T10:00:00+09:00", "temp_c": 21.6, "precip_prob_pct": 5,  "icon": "clear",         "wind_ms": 3.1, "humidity_pct": 55, "feels_like_c": 21.2 },
+    { "hour": "11", "iso": "2026-05-07T11:00:00+09:00", "temp_c": 23.2, "precip_prob_pct": 5,  "icon": "clear",         "wind_ms": 3.3, "humidity_pct": 50, "feels_like_c": 22.8 },
+    { "hour": "12", "iso": "2026-05-07T12:00:00+09:00", "temp_c": 24.5, "precip_prob_pct": 10, "icon": "partly_cloudy", "wind_ms": 3.5, "humidity_pct": 47, "feels_like_c": 24.0 },
+    { "hour": "13", "iso": "2026-05-07T13:00:00+09:00", "temp_c": 25.1, "precip_prob_pct": 15, "icon": "partly_cloudy", "wind_ms": 3.7, "humidity_pct": 46, "feels_like_c": 24.5 },
+    { "hour": "14", "iso": "2026-05-07T14:00:00+09:00", "temp_c": 25.0, "precip_prob_pct": 20, "icon": "partly_cloudy", "wind_ms": 3.6, "humidity_pct": 48, "feels_like_c": 24.4 }
+  ],
+
+  "daily_7d": [
+    { "day_label": "수", "date": "2026-05-06", "temp_min_c": 14, "temp_max_c": 23, "precip_prob_pct": 20, "icon": "partly_cloudy", "condition": "부분 흐림" },
+    { "day_label": "목", "date": "2026-05-07", "temp_min_c": 13, "temp_max_c": 25, "precip_prob_pct": 15, "icon": "clear",         "condition": "맑음" },
+    { "day_label": "금", "date": "2026-05-08", "temp_min_c": 15, "temp_max_c": 26, "precip_prob_pct": 30, "icon": "partly_cloudy", "condition": "구름조금" },
+    { "day_label": "토", "date": "2026-05-09", "temp_min_c": 17, "temp_max_c": 24, "precip_prob_pct": 70, "icon": "rain",          "condition": "비" },
+    { "day_label": "일", "date": "2026-05-10", "temp_min_c": 16, "temp_max_c": 21, "precip_prob_pct": 80, "icon": "rain",          "condition": "비" },
+    { "day_label": "월", "date": "2026-05-11", "temp_min_c": 13, "temp_max_c": 20, "precip_prob_pct": 30, "icon": "partly_cloudy", "condition": "구름조금" },
+    { "day_label": "화", "date": "2026-05-12", "temp_min_c": 12, "temp_max_c": 22, "precip_prob_pct": 10, "icon": "clear",         "condition": "맑음" }
+  ],
+
+  "alerts_active": [
+    {
+      "code": "heavy_rain_warning",
+      "level": "경보",
+      "severity": "emergency",
+      "title": "호우경보",
+      "regions": ["서울 전 지역", "경기 북부"],
+      "issued_at": "2026-05-06T15:30:00+09:00",
+      "valid_until": "2026-05-07T06:00:00+09:00",
+      "message": "3시간 90mm 이상의 강수 예상. 저지대 침수, 산사태에 각별한 주의가 필요합니다.",
+      "action": "외출 자제, 저지대·하천변 접근 금지",
+      "issuer": "기상청",
+      "icon": "siren"
+    }
+  ],
+
+  "alerts_adjacent": [
+    { "code": "strong_wind_advisory", "level": "주의보", "severity": "caution",  "title": "강풍주의보", "regions": ["서해 5도"],   "valid_until": "2026-05-07T03:00:00+09:00" },
+    { "code": "heavy_rain_advisory",  "level": "주의보", "severity": "warning",  "title": "호우주의보", "regions": ["인천", "강화"], "valid_until": "2026-05-07T06:00:00+09:00" },
+    { "code": "heat_advisory",        "level": "주의보", "severity": "caution",  "title": "폭염주의보", "regions": ["대구", "포항"], "valid_until": "2026-05-07T18:00:00+09:00" }
+  ],
+
+  "alert_regions": [
+    { "code": "11110", "name": "종로구", "level": "warning" },
+    { "code": "11140", "name": "중구",   "level": "warning" },
+    { "code": "11170", "name": "용산구", "level": "warning" },
+    { "code": "11200", "name": "성동구", "level": "warning" },
+    { "code": "11215", "name": "광진구", "level": "warning" },
+    { "code": "11230", "name": "동대문구", "level": "warning" },
+    { "code": "11260", "name": "중랑구", "level": "caution" },
+    { "code": "11290", "name": "성북구", "level": "warning" },
+    { "code": "11305", "name": "강북구", "level": "caution" },
+    { "code": "11320", "name": "도봉구", "level": "caution" },
+    { "code": "11350", "name": "노원구", "level": "caution" },
+    { "code": "11380", "name": "은평구", "level": "warning" },
+    { "code": "11410", "name": "서대문구", "level": "warning" },
+    { "code": "11440", "name": "마포구", "level": "warning" },
+    { "code": "11470", "name": "양천구", "level": "warning" },
+    { "code": "11500", "name": "강서구", "level": "warning" },
+    { "code": "11530", "name": "구로구", "level": "warning" },
+    { "code": "11545", "name": "금천구", "level": "warning" },
+    { "code": "11560", "name": "영등포구", "level": "warning" },
+    { "code": "11590", "name": "동작구", "level": "warning" },
+    { "code": "11620", "name": "관악구", "level": "warning" },
+    { "code": "11650", "name": "서초구", "level": "warning" },
+    { "code": "11680", "name": "강남구", "level": "warning" },
+    { "code": "11710", "name": "송파구", "level": "warning" },
+    { "code": "11740", "name": "강동구", "level": "warning" }
+  ],
+
+  "airquality_now": {
+    "city": "서울",
+    "station": "종로구 측정소",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "khai": 92,
+    "khai_grade": "보통",
+    "pm25_ugm3": 32,
+    "pm25_grade": "보통",
+    "pm10_ugm3": 58,
+    "pm10_grade": "보통",
+    "o3_ppm": 0.062,
+    "o3_grade": "보통",
+    "no2_ppm": 0.024,
+    "no2_grade": "좋음",
+    "so2_ppm": 0.004,
+    "so2_grade": "좋음",
+    "co_ppm": 0.5,
+    "co_grade": "좋음",
+    "natural_label": "보통 - 민감군 외 활동 가능"
+  },
+
+  "aqi_24h": [
+    { "hour": "15", "khai": 78, "pm25_ugm3": 24, "pm10_ugm3": 38, "o3_ppm": 0.045, "grade": "보통" },
+    { "hour": "16", "khai": 82, "pm25_ugm3": 26, "pm10_ugm3": 41, "o3_ppm": 0.052, "grade": "보통" },
+    { "hour": "17", "khai": 88, "pm25_ugm3": 30, "pm10_ugm3": 46, "o3_ppm": 0.058, "grade": "보통" },
+    { "hour": "18", "khai": 92, "pm25_ugm3": 32, "pm10_ugm3": 50, "o3_ppm": 0.062, "grade": "보통" },
+    { "hour": "19", "khai": 95, "pm25_ugm3": 33, "pm10_ugm3": 54, "o3_ppm": 0.054, "grade": "보통" },
+    { "hour": "20", "khai": 98, "pm25_ugm3": 35, "pm10_ugm3": 58, "o3_ppm": 0.044, "grade": "보통" },
+    { "hour": "21", "khai": 96, "pm25_ugm3": 34, "pm10_ugm3": 56, "o3_ppm": 0.038, "grade": "보통" },
+    { "hour": "22", "khai": 88, "pm25_ugm3": 32, "pm10_ugm3": 52, "o3_ppm": 0.034, "grade": "보통" },
+    { "hour": "23", "khai": 84, "pm25_ugm3": 30, "pm10_ugm3": 48, "o3_ppm": 0.030, "grade": "보통" },
+    { "hour": "00", "khai": 78, "pm25_ugm3": 28, "pm10_ugm3": 44, "o3_ppm": 0.028, "grade": "보통" },
+    { "hour": "01", "khai": 72, "pm25_ugm3": 25, "pm10_ugm3": 40, "o3_ppm": 0.025, "grade": "보통" },
+    { "hour": "02", "khai": 68, "pm25_ugm3": 23, "pm10_ugm3": 36, "o3_ppm": 0.023, "grade": "보통" },
+    { "hour": "03", "khai": 64, "pm25_ugm3": 21, "pm10_ugm3": 32, "o3_ppm": 0.021, "grade": "보통" },
+    { "hour": "04", "khai": 60, "pm25_ugm3": 20, "pm10_ugm3": 30, "o3_ppm": 0.020, "grade": "보통" },
+    { "hour": "05", "khai": 58, "pm25_ugm3": 19, "pm10_ugm3": 28, "o3_ppm": 0.019, "grade": "보통" },
+    { "hour": "06", "khai": 64, "pm25_ugm3": 22, "pm10_ugm3": 32, "o3_ppm": 0.022, "grade": "보통" },
+    { "hour": "07", "khai": 78, "pm25_ugm3": 28, "pm10_ugm3": 42, "o3_ppm": 0.028, "grade": "보통" },
+    { "hour": "08", "khai": 92, "pm25_ugm3": 34, "pm10_ugm3": 52, "o3_ppm": 0.036, "grade": "보통" },
+    { "hour": "09", "khai": 102,"pm25_ugm3": 38, "pm10_ugm3": 60, "o3_ppm": 0.046, "grade": "나쁨" },
+    { "hour": "10", "khai": 108,"pm25_ugm3": 42, "pm10_ugm3": 68, "o3_ppm": 0.058, "grade": "나쁨" },
+    { "hour": "11", "khai": 112,"pm25_ugm3": 44, "pm10_ugm3": 72, "o3_ppm": 0.068, "grade": "나쁨" },
+    { "hour": "12", "khai": 110,"pm25_ugm3": 42, "pm10_ugm3": 70, "o3_ppm": 0.072, "grade": "나쁨" },
+    { "hour": "13", "khai": 102,"pm25_ugm3": 38, "pm10_ugm3": 64, "o3_ppm": 0.068, "grade": "나쁨" },
+    { "hour": "14", "khai": 96, "pm25_ugm3": 34, "pm10_ugm3": 58, "o3_ppm": 0.058, "grade": "보통" }
+  ],
+
+  "aqi_stations_nearby": [
+    { "station": "종로구",   "distance_km": 0.0, "khai": 92, "pm25_ugm3": 32, "grade": "보통" },
+    { "station": "중구",     "distance_km": 1.8, "khai": 96, "pm25_ugm3": 34, "grade": "보통" },
+    { "station": "용산구",   "distance_km": 3.2, "khai": 88, "pm25_ugm3": 30, "grade": "보통" },
+    { "station": "성동구",   "distance_km": 4.6, "khai": 102,"pm25_ugm3": 38, "grade": "나쁨" },
+    { "station": "마포구",   "distance_km": 5.4, "khai": 84, "pm25_ugm3": 28, "grade": "보통" }
+  ],
+
+  "uv_now": {
+    "city": "서울",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "uv_index": 6,
+    "uv_label": "높음",
+    "uv_token": "--uv-high",
+    "burn_minutes_skin_type_2": 25,
+    "burn_minutes_skin_type_3": 35,
+    "burn_minutes_skin_type_4": 50,
+    "recommend_action": "선크림(SPF 30+) + 모자, 11~15시 외출 자제",
+    "peak_uv_today": 9,
+    "peak_time": "12:30"
+  },
+
+  "uv_24h": [
+    { "hour": "06", "uv_index": 0 },
+    { "hour": "07", "uv_index": 1 },
+    { "hour": "08", "uv_index": 2 },
+    { "hour": "09", "uv_index": 3 },
+    { "hour": "10", "uv_index": 5 },
+    { "hour": "11", "uv_index": 7 },
+    { "hour": "12", "uv_index": 9 },
+    { "hour": "13", "uv_index": 9 },
+    { "hour": "14", "uv_index": 7 },
+    { "hour": "15", "uv_index": 6 },
+    { "hour": "16", "uv_index": 4 },
+    { "hour": "17", "uv_index": 2 },
+    { "hour": "18", "uv_index": 1 },
+    { "hour": "19", "uv_index": 0 }
+  ],
+
+  "wind_now": {
+    "city": "서울",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "wind_ms": 4.2,
+    "wind_dir_deg": 235,
+    "wind_dir_label": "남서",
+    "wind_gust_ms": 6.8,
+    "beaufort": 3,
+    "beaufort_label": "산들바람"
+  },
+
+  "wind_distribution": [
+    { "direction": "N",   "deg": 0,    "frequency_pct": 5,  "avg_speed_ms": 2.1 },
+    { "direction": "NNE", "deg": 22.5, "frequency_pct": 4,  "avg_speed_ms": 2.4 },
+    { "direction": "NE",  "deg": 45,   "frequency_pct": 8,  "avg_speed_ms": 3.2 },
+    { "direction": "ENE", "deg": 67.5, "frequency_pct": 6,  "avg_speed_ms": 2.9 },
+    { "direction": "E",   "deg": 90,   "frequency_pct": 7,  "avg_speed_ms": 2.8 },
+    { "direction": "ESE", "deg": 112.5,"frequency_pct": 5,  "avg_speed_ms": 2.4 },
+    { "direction": "SE",  "deg": 135,  "frequency_pct": 6,  "avg_speed_ms": 2.6 },
+    { "direction": "SSE", "deg": 157.5,"frequency_pct": 8,  "avg_speed_ms": 3.1 },
+    { "direction": "S",   "deg": 180,  "frequency_pct": 10, "avg_speed_ms": 3.4 },
+    { "direction": "SSW", "deg": 202.5,"frequency_pct": 12, "avg_speed_ms": 3.8 },
+    { "direction": "SW",  "deg": 225,  "frequency_pct": 15, "avg_speed_ms": 4.2 },
+    { "direction": "WSW", "deg": 247.5,"frequency_pct": 13, "avg_speed_ms": 4.0 },
+    { "direction": "W",   "deg": 270,  "frequency_pct": 9,  "avg_speed_ms": 3.5 },
+    { "direction": "WNW", "deg": 292.5,"frequency_pct": 6,  "avg_speed_ms": 3.0 },
+    { "direction": "NW",  "deg": 315,  "frequency_pct": 4,  "avg_speed_ms": 2.5 },
+    { "direction": "NNW", "deg": 337.5,"frequency_pct": 3,  "avg_speed_ms": 2.2 }
+  ],
+
+  "wind_24h_speed": [
+    { "hour": "15", "wind_ms": 4.2, "gust_ms": 6.8 },
+    { "hour": "16", "wind_ms": 4.5, "gust_ms": 7.0 },
+    { "hour": "17", "wind_ms": 4.6, "gust_ms": 7.2 },
+    { "hour": "18", "wind_ms": 4.4, "gust_ms": 6.9 },
+    { "hour": "19", "wind_ms": 4.0, "gust_ms": 6.4 },
+    { "hour": "20", "wind_ms": 3.5, "gust_ms": 5.6 },
+    { "hour": "21", "wind_ms": 3.2, "gust_ms": 5.0 },
+    { "hour": "22", "wind_ms": 2.9, "gust_ms": 4.5 },
+    { "hour": "23", "wind_ms": 2.6, "gust_ms": 4.1 },
+    { "hour": "00", "wind_ms": 2.4, "gust_ms": 3.8 },
+    { "hour": "01", "wind_ms": 2.2, "gust_ms": 3.5 },
+    { "hour": "02", "wind_ms": 2.0, "gust_ms": 3.2 },
+    { "hour": "03", "wind_ms": 1.8, "gust_ms": 2.9 },
+    { "hour": "04", "wind_ms": 1.7, "gust_ms": 2.7 },
+    { "hour": "05", "wind_ms": 1.8, "gust_ms": 2.9 },
+    { "hour": "06", "wind_ms": 2.0, "gust_ms": 3.2 },
+    { "hour": "07", "wind_ms": 2.4, "gust_ms": 3.8 },
+    { "hour": "08", "wind_ms": 2.8, "gust_ms": 4.5 },
+    { "hour": "09", "wind_ms": 3.2, "gust_ms": 5.1 },
+    { "hour": "10", "wind_ms": 3.5, "gust_ms": 5.6 },
+    { "hour": "11", "wind_ms": 3.8, "gust_ms": 6.1 },
+    { "hour": "12", "wind_ms": 4.0, "gust_ms": 6.4 },
+    { "hour": "13", "wind_ms": 4.2, "gust_ms": 6.7 },
+    { "hour": "14", "wind_ms": 4.3, "gust_ms": 6.8 }
+  ],
+
+  "precip_today": {
+    "city": "서울",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "precip_now_mm_h": 0,
+    "accumulated_24h_mm": 12,
+    "expected_tomorrow_mm": 32,
+    "type": "rain",
+    "type_label": "비",
+    "intensity_label": "보통",
+    "natural_label": "오후 늦게부터 비, 우산 필수"
+  },
+
+  "precip_hourly_6h": [
+    { "hour": "16", "precip_mm": 0.0,  "precip_prob_pct": 15 },
+    { "hour": "17", "precip_mm": 0.4,  "precip_prob_pct": 25 },
+    { "hour": "18", "precip_mm": 1.8,  "precip_prob_pct": 35 },
+    { "hour": "19", "precip_mm": 4.2,  "precip_prob_pct": 50 },
+    { "hour": "20", "precip_mm": 6.8,  "precip_prob_pct": 70 },
+    { "hour": "21", "precip_mm": 5.4,  "precip_prob_pct": 80 }
+  ],
+
+  "precip_matrix_24x7": {
+    "days": ["수","목","금","토","일","월","화"],
+    "hours": ["00","03","06","09","12","15","18","21"],
+    "matrix": [
+      [10, 10,  5,  5, 10, 20, 35, 70],
+      [25, 20, 10, 10, 15, 15, 20, 25],
+      [20, 15, 15, 20, 25, 30, 35, 40],
+      [60, 70, 75, 80, 75, 70, 60, 50],
+      [70, 80, 85, 80, 70, 60, 50, 40],
+      [30, 25, 20, 25, 30, 35, 30, 25],
+      [10, 10,  5,  5, 10, 10, 15, 10]
+    ]
+  },
+
+  "cities_compare": [
+    { "city": "서울",   "city_en": "Seoul",     "temp_c": 22, "icon": "partly_cloudy", "condition": "부분 흐림", "precip_prob_pct": 20, "humidity_pct": 58, "pm25_ugm3": 28, "khai": 92,  "wind_ms": 2.4, "delta_temp_yesterday_c":  2 },
+    { "city": "부산",   "city_en": "Busan",     "temp_c": 24, "icon": "clear",         "condition": "맑음",     "precip_prob_pct": 15, "humidity_pct": 70, "pm25_ugm3": 18, "khai": 56,  "wind_ms": 4.2, "delta_temp_yesterday_c":  1 },
+    { "city": "제주",   "city_en": "Jeju",      "temp_c": 21, "icon": "rain",          "condition": "비",       "precip_prob_pct": 70, "humidity_pct": 82, "pm25_ugm3": 14, "khai": 38,  "wind_ms": 5.4, "delta_temp_yesterday_c": -1 },
+    { "city": "대구",   "city_en": "Daegu",     "temp_c": 25, "icon": "clear",         "condition": "맑음",     "precip_prob_pct":  5, "humidity_pct": 50, "pm25_ugm3": 38, "khai": 108, "wind_ms": 1.8, "delta_temp_yesterday_c":  3 },
+    { "city": "인천",   "city_en": "Incheon",   "temp_c": 21, "icon": "partly_cloudy", "condition": "구름조금", "precip_prob_pct": 25, "humidity_pct": 65, "pm25_ugm3": 30, "khai": 88,  "wind_ms": 3.8, "delta_temp_yesterday_c":  1 },
+    { "city": "강릉",   "city_en": "Gangneung", "temp_c": 19, "icon": "clear",         "condition": "맑음",     "precip_prob_pct": 10, "humidity_pct": 58, "pm25_ugm3": 22, "khai": 62,  "wind_ms": 2.2, "delta_temp_yesterday_c":  0 },
+    { "city": "광주",   "city_en": "Gwangju",   "temp_c": 23, "icon": "clear",         "condition": "맑음",     "precip_prob_pct": 10, "humidity_pct": 60, "pm25_ugm3": 24, "khai": 78,  "wind_ms": 2.6, "delta_temp_yesterday_c":  2 }
+  ],
+
+  "sun_arc": {
+    "date": "2026-05-06",
+    "city": "서울",
+    "sunrise": "05:38",
+    "sunset": "19:24",
+    "solar_noon": "12:31",
+    "daylight_min": 826,
+    "yesterday_daylight_diff_min": 2,
+    "civil_twilight_morning": "05:09",
+    "civil_twilight_evening": "19:53",
+    "nautical_twilight_morning": "04:34",
+    "nautical_twilight_evening": "20:28",
+    "astronomical_twilight_morning": "03:55",
+    "astronomical_twilight_evening": "21:07",
+    "current_time": "15:24",
+    "current_progress_pct": 71.2,
+    "season": "초여름",
+    "next_solar_term": "입하",
+    "next_solar_term_date": "2026-05-05"
+  },
+
+  "monthly_climate_seoul": {
+    "city": "서울",
+    "period": "1991-2020 평년",
+    "annual_avg_temp_c": 12.5,
+    "annual_precip_mm": 1417.9,
+    "months": [
+      { "month":  1, "temp_avg_c": -2.4, "temp_max_c":  1.5, "temp_min_c": -5.9, "precip_mm":  16.8 },
+      { "month":  2, "temp_avg_c":  0.4, "temp_max_c":  4.7, "temp_min_c": -3.4, "precip_mm":  28.2 },
+      { "month":  3, "temp_avg_c":  5.7, "temp_max_c": 10.4, "temp_min_c":  1.6, "precip_mm":  36.9 },
+      { "month":  4, "temp_avg_c": 12.5, "temp_max_c": 17.8, "temp_min_c":  7.8, "precip_mm":  72.9 },
+      { "month":  5, "temp_avg_c": 17.8, "temp_max_c": 23.0, "temp_min_c": 13.2, "precip_mm": 103.6 },
+      { "month":  6, "temp_avg_c": 22.2, "temp_max_c": 27.1, "temp_min_c": 18.2, "precip_mm": 129.5 },
+      { "month":  7, "temp_avg_c": 25.1, "temp_max_c": 28.9, "temp_min_c": 22.1, "precip_mm": 414.4 },
+      { "month":  8, "temp_avg_c": 26.1, "temp_max_c": 30.0, "temp_min_c": 22.8, "precip_mm": 348.2 },
+      { "month":  9, "temp_avg_c": 21.6, "temp_max_c": 26.4, "temp_min_c": 17.6, "precip_mm": 141.5 },
+      { "month": 10, "temp_avg_c": 14.9, "temp_max_c": 20.3, "temp_min_c": 10.3, "precip_mm":  52.2 },
+      { "month": 11, "temp_avg_c":  7.5, "temp_max_c": 11.9, "temp_min_c":  3.2, "precip_mm":  51.1 },
+      { "month": 12, "temp_avg_c":  0.2, "temp_max_c":  4.1, "temp_min_c": -3.5, "precip_mm":  22.6 }
+    ]
+  },
+
+  "extreme_records": [
+    { "label": "관측 사상 최고기온", "value_c":  39.6, "date": "2018-08-01", "city": "서울" },
+    { "label": "관측 사상 최저기온", "value_c": -23.1, "date": "1927-12-31", "city": "서울" },
+    { "label": "일강수량 최고",      "value_mm": 354.7,"date": "1998-08-08", "city": "서울" }
+  ],
+
+  "pollen_yellowdust": {
+    "city": "서울",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "pollen_oak_count": 220,
+    "pollen_oak_grade": "나쁨",
+    "pollen_pine_count": 480,
+    "pollen_pine_grade": "매우나쁨",
+    "pollen_grass_count": 25,
+    "pollen_grass_grade": "좋음",
+    "yellow_dust_pm10_ugm3": 95,
+    "yellow_dust_grade": "보통",
+    "natural_label": "민감군 외출 자제, 마스크 권장",
+    "mask_recommendation": "KF94 권장",
+    "outdoor_advisable_window": "06:00 ~ 09:00"
+  },
+
+  "pollen_7d_trend": [
+    { "date": "2026-05-01", "oak_count": 80,  "pine_count": 180, "grass_count": 12 },
+    { "date": "2026-05-02", "oak_count": 110, "pine_count": 240, "grass_count": 14 },
+    { "date": "2026-05-03", "oak_count": 160, "pine_count": 320, "grass_count": 18 },
+    { "date": "2026-05-04", "oak_count": 195, "pine_count": 410, "grass_count": 22 },
+    { "date": "2026-05-05", "oak_count": 210, "pine_count": 460, "grass_count": 25 },
+    { "date": "2026-05-06", "oak_count": 220, "pine_count": 480, "grass_count": 25 },
+    { "date": "2026-05-07", "oak_count": 240, "pine_count": 520, "grass_count": 28 }
+  ],
+
+  "marine": {
+    "city": "부산",
+    "spot": "해운대",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "wave_height_m": 1.4,
+    "wave_period_s": 6.2,
+    "wave_grade": "보통",
+    "sea_temp_c": 17.1,
+    "swell_dir_deg": 195,
+    "wind_ms": 4.2,
+    "wind_dir_deg": 235,
+    "wind_dir_label": "남서",
+    "marine_alert": "없음",
+    "natural_label": "잔잔 - 일반 해수욕 가능, 서핑 적합"
+  },
+
+  "tide_12h": [
+    { "time": "12:14", "tide_cm":  42, "type": "간조" },
+    { "time": "13:00", "tide_cm":  78 },
+    { "time": "14:00", "tide_cm": 142 },
+    { "time": "15:00", "tide_cm": 198 },
+    { "time": "16:00", "tide_cm": 240 },
+    { "time": "17:00", "tide_cm": 264 },
+    { "time": "18:00", "tide_cm": 268, "type": "만조" },
+    { "time": "18:42", "tide_cm": 272, "type": "만조" },
+    { "time": "19:00", "tide_cm": 260 },
+    { "time": "20:00", "tide_cm": 222 },
+    { "time": "21:00", "tide_cm": 168 },
+    { "time": "22:00", "tide_cm": 112 },
+    { "time": "23:00", "tide_cm":  68 },
+    { "time": "00:00", "tide_cm":  44, "type": "간조" }
+  ],
+
+  "outdoor_activity": {
+    "city": "서울",
+    "observed_at": "2026-05-06T15:24:00+09:00",
+    "activity_score": 78,
+    "activity_grade": "좋음",
+    "activities": [
+      { "key": "running", "label": "러닝",   "score": 90, "grade": "최적" },
+      { "key": "hiking",  "label": "등산",   "score": 78, "grade": "좋음" },
+      { "key": "golf",    "label": "골프",   "score": 65, "grade": "보통" },
+      { "key": "camping", "label": "캠핑",   "score": 80, "grade": "좋음" },
+      { "key": "cycling", "label": "자전거", "score": 75, "grade": "좋음" }
+    ],
+    "factors": {
+      "feels_like_c": 21.8,
+      "uv_index": 6,
+      "wind_ms": 2.4,
+      "precip_prob_pct": 20,
+      "pm25_ugm3": 28
+    },
+    "best_window": "09:00 ~ 15:00",
+    "natural_label": "야외활동 매우 적합, 자외선 차단 권장"
+  },
+
+  "travel_weather": [
+    { "city": "제주",   "country": "KR", "temp_c": 21, "condition": "비",       "icon": "rain",          "precip_prob_pct": 70, "uv_index": 4, "suitability": "보통",  "tip": "우산 필수" },
+    { "city": "부산",   "country": "KR", "temp_c": 24, "condition": "맑음",     "icon": "clear",         "precip_prob_pct": 15, "uv_index": 7, "suitability": "좋음",  "tip": "선크림 권장" },
+    { "city": "강릉",   "country": "KR", "temp_c": 19, "condition": "맑음",     "icon": "clear",         "precip_prob_pct": 10, "uv_index": 5, "suitability": "좋음",  "tip": "쾌청한 동해" },
+    { "city": "도쿄",   "country": "JP", "temp_c": 21, "condition": "구름조금", "icon": "partly_cloudy", "precip_prob_pct": 30, "uv_index": 6, "suitability": "좋음",  "tip": "겉옷 챙기기" },
+    { "city": "방콕",   "country": "TH", "temp_c": 33, "condition": "맑음",     "icon": "clear",         "precip_prob_pct": 20, "uv_index": 11,"suitability": "주의",  "tip": "폭염·자외선 위험" },
+    { "city": "싱가포르","country": "SG", "temp_c": 28, "condition": "비",       "icon": "rain",          "precip_prob_pct": 80, "uv_index": 9, "suitability": "보통",  "tip": "스콜 자주" }
+  ]
+}

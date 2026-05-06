@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>주간 예보 · 서울 · 다이어리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'],
+          serif: ['"Noto Serif KR"', 'Georgia', 'serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body {
+    background: #faf6ee;
+    background-image:
+      radial-gradient(#e7e0d2 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+    color: #3a2f25;
+    font-family: 'Pretendard Variable', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .paper {
+    background: #fffaf2;
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.04),
+      0 8px 18px -10px rgba(120, 80, 40, 0.18);
+  }
+  .paper-edge {
+    background:
+      linear-gradient(#fffaf2, #fffaf2),
+      repeating-linear-gradient(45deg, #f3ead9, #f3ead9 6px, #ede2cc 6px, #ede2cc 12px);
+    background-clip: padding-box, border-box;
+    border: 4px solid transparent;
+  }
+  .tape {
+    background: #ffe9a8;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transform: rotate(-2deg);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.45) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.45) 75%, transparent 75%);
+    background-size: 8px 8px;
+  }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .stamp {
+    border: 2.5px solid currentColor;
+    color: #b54a2c;
+    font-family: 'Noto Serif KR', Georgia, serif;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    transform: rotate(-6deg);
+    opacity: 0.85;
+  }
+  .row-rotate-1 { transform: rotate(-0.4deg); }
+  .row-rotate-2 { transform: rotate(0.3deg); }
+  .row-rotate-3 { transform: rotate(-0.2deg); }
+  .temp-bar {
+    background: linear-gradient(to right, #38bdf8 0%, #f59e0b 100%);
+    border-radius: 9999px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.07);
+  }
+  :focus-visible { outline: 2px solid #c2410c; outline-offset: 3px; border-radius: 6px; }
+  .fade-in { animation: paperIn 360ms ease-out both; }
+  .fade-in:nth-child(1) { animation-delay: 0ms; }
+  .fade-in:nth-child(2) { animation-delay: 40ms; }
+  .fade-in:nth-child(3) { animation-delay: 80ms; }
+  .fade-in:nth-child(4) { animation-delay: 120ms; }
+  .fade-in:nth-child(5) { animation-delay: 160ms; }
+  .fade-in:nth-child(6) { animation-delay: 200ms; }
+  .fade-in:nth-child(7) { animation-delay: 240ms; }
+  @keyframes paperIn { from { opacity: 0; transform: translateY(6px) rotate(0deg); } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+  /* condition chip */
+  .chip-clear   { background: #fef3c7; color: #78350f; }
+  .chip-pcloudy { background: #e0f2fe; color: #075985; }
+  .chip-cloudy  { background: #f1f5f9; color: #334155; }
+  .chip-rain    { background: #dbeafe; color: #1e3a8a; }
+</style>
+</head>
+<body class="antialiased">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14" role="main">
+
+    <!-- 헤더 -->
+    <header class="relative mb-10 sm:mb-12">
+      <div class="absolute -top-3 left-6 sm:left-10 px-4 py-1 tape rounded-sm">
+        <span class="text-xs font-bold tracking-widest text-amber-900">WEEK 19</span>
+      </div>
+      <div class="paper-edge rounded-2xl p-6 sm:p-8 mt-4">
+        <div class="flex items-baseline justify-between flex-wrap gap-2">
+          <h1 class="font-serif text-2xl sm:text-3xl text-stone-800">
+            주간 예보 다이어리
+          </h1>
+          <p class="num text-xs sm:text-sm text-stone-500">
+            2026.05.06 ~ 05.12 · 서울
+          </p>
+        </div>
+        <p class="mt-2 text-sm text-stone-600">
+          이번 주 평균 <span class="num font-semibold">19.4°</span> · 토~일 비, 우산 챙기세요
+        </p>
+      </div>
+    </header>
+
+    <!-- 7일 -->
+    <section aria-labelledby="weekly-heading" class="space-y-3">
+      <h2 id="weekly-heading" class="sr-only">7일 예보</h2>
+      <ol class="space-y-3" id="daily-list"></ol>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="mt-12 flex items-center justify-between">
+      <p class="text-[11px] text-stone-500 tracking-wider uppercase">
+        KMA 기상청 · 단기예보
+      </p>
+      <div class="stamp inline-flex items-center px-3 py-1 rounded">
+        <span class="text-xs">FORECAST · 05.06</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- 아이콘 SVG 정의 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="ic-clear" viewBox="0 0 32 32">
+        <circle cx="16" cy="16" r="6" fill="#f59e0b"/>
+        <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+          <line x1="16" y1="3" x2="16" y2="6"/>
+          <line x1="16" y1="26" x2="16" y2="29"/>
+          <line x1="3" y1="16" x2="6" y2="16"/>
+          <line x1="26" y1="16" x2="29" y2="16"/>
+          <line x1="6.5" y1="6.5" x2="8.5" y2="8.5"/>
+          <line x1="23.5" y1="23.5" x2="25.5" y2="25.5"/>
+          <line x1="6.5" y1="25.5" x2="8.5" y2="23.5"/>
+          <line x1="23.5" y1="8.5" x2="25.5" y2="6.5"/>
+        </g>
+      </symbol>
+      <symbol id="ic-pcloudy" viewBox="0 0 32 32">
+        <circle cx="22" cy="11" r="5" fill="#f59e0b"/>
+        <g fill="#94a3b8">
+          <ellipse cx="11" cy="22" rx="8" ry="5"/>
+          <ellipse cx="17" cy="20" rx="7" ry="6"/>
+          <rect x="6" y="22" width="20" height="6" rx="3"/>
+        </g>
+      </symbol>
+      <symbol id="ic-cloudy" viewBox="0 0 32 32">
+        <g fill="#64748b">
+          <ellipse cx="11" cy="20" rx="8" ry="5"/>
+          <ellipse cx="18" cy="17" rx="8" ry="6"/>
+          <rect x="6" y="20" width="22" height="6" rx="3"/>
+        </g>
+      </symbol>
+      <symbol id="ic-rain" viewBox="0 0 32 32">
+        <g fill="#64748b">
+          <ellipse cx="11" cy="14" rx="8" ry="5"/>
+          <ellipse cx="18" cy="11" rx="8" ry="6"/>
+          <rect x="6" y="14" width="22" height="6" rx="3"/>
+        </g>
+        <g stroke="#0ea5e9" stroke-width="2" stroke-linecap="round">
+          <line x1="11" y1="22" x2="9" y2="27"/>
+          <line x1="17" y1="22" x2="15" y2="27"/>
+          <line x1="23" y1="22" x2="21" y2="27"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <script>
+    const data = [
+      { day_label: "수", date: "2026-05-06", temp_min_c: 14, temp_max_c: 23, precip_prob_pct: 20, icon: "partly_cloudy", condition: "부분 흐림", note: "오늘" },
+      { day_label: "목", date: "2026-05-07", temp_min_c: 13, temp_max_c: 25, precip_prob_pct: 15, icon: "clear",         condition: "맑음" },
+      { day_label: "금", date: "2026-05-08", temp_min_c: 15, temp_max_c: 26, precip_prob_pct: 30, icon: "partly_cloudy", condition: "구름조금" },
+      { day_label: "토", date: "2026-05-09", temp_min_c: 17, temp_max_c: 24, precip_prob_pct: 70, icon: "rain",          condition: "비" },
+      { day_label: "일", date: "2026-05-10", temp_min_c: 16, temp_max_c: 21, precip_prob_pct: 80, icon: "rain",          condition: "비" },
+      { day_label: "월", date: "2026-05-11", temp_min_c: 13, temp_max_c: 20, precip_prob_pct: 30, icon: "partly_cloudy", condition: "구름조금" },
+      { day_label: "화", date: "2026-05-12", temp_min_c: 12, temp_max_c: 22, precip_prob_pct: 10, icon: "clear",         condition: "맑음" },
+    ];
+
+    const weekMin = Math.min(...data.map(d => d.temp_min_c));
+    const weekMax = Math.max(...data.map(d => d.temp_max_c));
+    const weekRange = weekMax - weekMin || 1;
+
+    function iconRef(key) {
+      switch (key) {
+        case "clear": return "ic-clear";
+        case "partly_cloudy": return "ic-pcloudy";
+        case "cloudy": return "ic-cloudy";
+        case "rain": return "ic-rain";
+        default: return "ic-pcloudy";
+      }
+    }
+    function chipClass(key) {
+      switch (key) {
+        case "clear": return "chip-clear";
+        case "partly_cloudy": return "chip-pcloudy";
+        case "cloudy": return "chip-cloudy";
+        case "rain": return "chip-rain";
+        default: return "chip-pcloudy";
+      }
+    }
+    function probLabel(p) {
+      if (p < 31) return "낮음";
+      if (p < 61) return "보통";
+      if (p < 81) return "높음";
+      return "매우높음";
+    }
+    function probColor(p) {
+      if (p < 31) return "text-stone-400";
+      if (p < 61) return "text-sky-600";
+      if (p < 81) return "text-blue-700";
+      return "text-blue-900 font-semibold";
+    }
+
+    const list = document.getElementById('daily-list');
+    data.forEach((d, idx) => {
+      const leftPct = ((d.temp_min_c - weekMin) / weekRange) * 100;
+      const widthPct = ((d.temp_max_c - d.temp_min_c) / weekRange) * 100;
+      const rotate = ['row-rotate-1','row-rotate-2','row-rotate-3'][idx % 3];
+      const isToday = idx === 0;
+
+      const li = document.createElement('li');
+      li.className = `paper rounded-xl px-4 sm:px-6 py-4 fade-in ${rotate} relative`;
+      li.setAttribute('aria-label',
+        `${d.day_label}요일 ${d.date}, ${d.condition}, 최저 ${d.temp_min_c}도, 최고 ${d.temp_max_c}도, 강수확률 ${d.precip_prob_pct}퍼센트`);
+
+      li.innerHTML = `
+        ${isToday ? `
+          <span class="absolute -top-2 -left-2 px-2.5 py-0.5 text-white text-[10px] font-bold rounded tracking-widest tape" style="background:#f87171;">TODAY</span>
+        ` : ''}
+        <div class="grid grid-cols-[3rem_2.5rem_1fr_4.5rem] sm:grid-cols-[4rem_3rem_1fr_6rem] items-center gap-3 sm:gap-4">
+          <!-- 요일/날짜 -->
+          <div>
+            <p class="font-serif text-xl sm:text-2xl text-stone-800 leading-none">${d.day_label}</p>
+            <p class="num text-[10px] text-stone-500 mt-1">${d.date.slice(5)}</p>
+          </div>
+          <!-- 아이콘 -->
+          <div class="flex items-center justify-center">
+            <svg class="w-9 h-9 sm:w-10 sm:h-10" aria-hidden="true"><use href="#${iconRef(d.icon)}"/></svg>
+          </div>
+          <!-- 온도 막대 + 강수 -->
+          <div class="min-w-0">
+            <div class="relative h-2.5 bg-stone-200/70 rounded-full overflow-hidden" role="img"
+                 aria-label="최저 ${d.temp_min_c}도 최고 ${d.temp_max_c}도 막대">
+              <div class="temp-bar absolute h-full"
+                   style="left:${leftPct.toFixed(1)}%; width:${Math.max(widthPct, 4).toFixed(1)}%;"></div>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-[11px] sm:text-xs">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${chipClass(d.icon)}">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                ${d.condition}
+              </span>
+              <span class="num ${probColor(d.precip_prob_pct)}" aria-label="강수확률 ${d.precip_prob_pct} 퍼센트, ${probLabel(d.precip_prob_pct)}">
+                💧 ${d.precip_prob_pct}% · ${probLabel(d.precip_prob_pct)}
+              </span>
+            </div>
+          </div>
+          <!-- 최저 / 최고 -->
+          <div class="text-right">
+            <p class="num text-stone-400 text-xs sm:text-sm">
+              <span class="sr-only">최저</span>${d.temp_min_c}°
+            </p>
+            <p class="num text-stone-800 text-xl sm:text-2xl font-light leading-tight">
+              <span class="sr-only">최고</span>${d.temp_max_c}°
+            </p>
+          </div>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>

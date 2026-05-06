@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>현재 날씨 · 서울 · 미니멀</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: ['class', '[data-theme="dark"]'],
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', '"Apple SD Gothic Neo"', '"Noto Sans KR"', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    --w-sunny: #f59e0b;
+    --w-partly-cloudy: #38bdf8;
+    --w-cloudy: #64748b;
+    --w-rain: #0ea5e9;
+    --w-night-clear: #4338ca;
+    --bg-base: #ffffff;
+    --bg-surface: #f8fafc;
+    --bg-elevated: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-tertiary: #64748b;
+    --border: #e2e8f0;
+    --focus-ring: #3b82f6;
+  }
+  [data-theme="dark"] {
+    --w-sunny: #fbbf24;
+    --w-partly-cloudy: #7dd3fc;
+    --w-cloudy: #cbd5e1;
+    --w-rain: #38bdf8;
+    --w-night-clear: #a5b4fc;
+    --bg-base: #020617;
+    --bg-surface: #0f172a;
+    --bg-elevated: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border: #334155;
+    --focus-ring: #60a5fa;
+  }
+  html, body { background: var(--bg-base); color: var(--text-primary); }
+  body { font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: 6px; }
+  .fade-in { animation: fadeUp 280ms ease-out both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body class="min-h-screen antialiased">
+  <main class="min-h-screen flex flex-col" role="main">
+    <!-- 상단 바: 위치 + 시각 + 토글 -->
+    <header class="flex items-center justify-between px-6 sm:px-10 lg:px-16 pt-6 sm:pt-8 lg:pt-10">
+      <div class="flex items-center gap-3 text-sm sm:text-base text-[var(--text-secondary)]">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s7-7.58 7-13a7 7 0 1 0-14 0c0 5.42 7 13 7 13Z" />
+          <circle cx="12" cy="9" r="2.5" />
+        </svg>
+        <span>서울 · <span class="num">15:24</span> KST</span>
+      </div>
+      <button id="theme-toggle" type="button"
+              class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-[var(--border)] hover:bg-[var(--bg-elevated)] transition"
+              aria-label="다크 모드 전환">
+        <svg id="icon-sun" class="w-5 h-5 text-[var(--text-secondary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+        <svg id="icon-moon" class="w-5 h-5 text-[var(--text-secondary)] hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- 히어로 -->
+    <section class="flex-1 flex items-center justify-center px-6 py-12">
+      <article class="w-full max-w-md text-center fade-in" aria-labelledby="hero-temp">
+        <!-- 컨디션 아이콘: 부분 흐림 (해 + 구름) -->
+        <div class="flex justify-center mb-8" aria-hidden="false">
+          <svg class="w-32 h-32 sm:w-36 sm:h-36" viewBox="0 0 120 120" role="img" aria-label="부분 흐림 일러스트">
+            <title>부분 흐림</title>
+            <!-- 해 -->
+            <g transform="translate(76 38)">
+              <circle r="18" fill="var(--w-sunny)" />
+              <g stroke="var(--w-sunny)" stroke-width="2.5" stroke-linecap="round">
+                <line x1="0" y1="-26" x2="0" y2="-32" />
+                <line x1="0" y1="26" x2="0" y2="32" />
+                <line x1="-26" y1="0" x2="-32" y2="0" />
+                <line x1="26" y1="0" x2="32" y2="0" />
+                <line x1="-18" y1="-18" x2="-22" y2="-22" />
+                <line x1="18" y1="18" x2="22" y2="22" />
+                <line x1="-18" y1="18" x2="-22" y2="22" />
+                <line x1="18" y1="-18" x2="22" y2="-22" />
+              </g>
+            </g>
+            <!-- 구름 -->
+            <g fill="var(--w-cloudy)" opacity="0.92">
+              <ellipse cx="40" cy="76" rx="22" ry="14" />
+              <ellipse cx="58" cy="70" rx="18" ry="16" />
+              <ellipse cx="74" cy="78" rx="16" ry="12" />
+              <rect x="36" y="76" width="42" height="14" rx="7" />
+            </g>
+          </svg>
+        </div>
+
+        <!-- 거대 기온 -->
+        <p id="hero-temp" class="num font-extralight leading-none text-[var(--text-primary)]"
+           style="font-size: clamp(96px, 22vw, 160px); letter-spacing: -0.04em;"
+           aria-label="현재 기온 섭씨 22.4도">
+          22.4<span class="text-[0.3em] font-light text-[var(--text-tertiary)] align-top ml-1">°C</span>
+        </p>
+
+        <!-- 상태 라벨 -->
+        <p class="mt-4 text-lg sm:text-xl text-[var(--text-secondary)]">
+          부분 흐림 · 체감 <span class="num">21.8</span><span class="text-base text-[var(--text-tertiary)]">°</span>
+        </p>
+        <p class="mt-2 text-sm text-[var(--text-tertiary)]">
+          선선함, 가벼운 외투 권장
+        </p>
+
+        <!-- MetricCell ×4 -->
+        <dl class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-3" role="group" aria-label="보조 지표">
+          <div class="rounded-xl bg-[var(--bg-elevated)] p-4 text-left" role="group" aria-label="습도">
+            <dt class="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--text-tertiary)]">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2.5s6 6.7 6 11.5a6 6 0 1 1-12 0c0-4.8 6-11.5 6-11.5Z" />
+              </svg>
+              습도
+            </dt>
+            <dd class="mt-2">
+              <span class="num text-3xl font-light text-[var(--text-primary)]">58</span><span class="text-base text-[var(--text-tertiary)] ml-0.5">%</span>
+            </dd>
+          </div>
+
+          <div class="rounded-xl bg-[var(--bg-elevated)] p-4 text-left" role="group" aria-label="풍속">
+            <dt class="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--text-tertiary)]">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8h12a3 3 0 1 0-3-3" />
+                <path d="M3 14h17a3 3 0 1 1-3 3" />
+              </svg>
+              풍속
+            </dt>
+            <dd class="mt-2">
+              <span class="num text-3xl font-light text-[var(--text-primary)]">2.4</span><span class="text-base text-[var(--text-tertiary)] ml-0.5">m/s</span>
+            </dd>
+            <p class="mt-0.5 text-[11px] text-[var(--text-tertiary)]">남서</p>
+          </div>
+
+          <div class="rounded-xl bg-[var(--bg-elevated)] p-4 text-left" role="group" aria-label="자외선 지수">
+            <dt class="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--text-tertiary)]">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4" />
+              </svg>
+              UV
+            </dt>
+            <dd class="mt-2 flex items-baseline gap-2">
+              <span class="num text-3xl font-light text-[var(--text-primary)]">6</span>
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-300">높음</span>
+            </dd>
+          </div>
+
+          <div class="rounded-xl bg-[var(--bg-elevated)] p-4 text-left" role="group" aria-label="강수 확률">
+            <dt class="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--text-tertiary)]">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3.5s6 7.5 6 12a6 6 0 1 1-12 0c0-4.5 6-12 6-12Z" />
+              </svg>
+              강수확률
+            </dt>
+            <dd class="mt-2">
+              <span class="num text-3xl font-light text-[var(--text-primary)]">20</span><span class="text-base text-[var(--text-tertiary)] ml-0.5">%</span>
+            </dd>
+          </div>
+        </dl>
+
+        <!-- 메타 -->
+        <p class="mt-10 text-[11px] text-[var(--text-tertiary)] tracking-wider uppercase">
+          KMA · 종로구 측정소 · <span class="num">2026-05-06</span>
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const html = document.documentElement;
+      const btn = document.getElementById('theme-toggle');
+      const iconSun = document.getElementById('icon-sun');
+      const iconMoon = document.getElementById('icon-moon');
+
+      function apply(theme) {
+        html.setAttribute('data-theme', theme);
+        if (theme === 'dark') {
+          iconSun.classList.add('hidden');
+          iconMoon.classList.remove('hidden');
+          btn.setAttribute('aria-label', '라이트 모드 전환');
+        } else {
+          iconSun.classList.remove('hidden');
+          iconMoon.classList.add('hidden');
+          btn.setAttribute('aria-label', '다크 모드 전환');
+        }
+        try { localStorage.setItem('w-theme', theme); } catch (e) {}
+      }
+
+      const saved = (function() {
+        try { return localStorage.getItem('w-theme'); } catch (e) { return null; }
+      })();
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      apply(saved || (prefersDark ? 'dark' : 'light'));
+
+      btn.addEventListener('click', function() {
+        apply(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>해양 · 부산 해운대 · 파고 1.4m</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: { fontFamily: { sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'] } } },
+  };
+</script>
+<style>
+  :root {
+    --bg-base: #050b1a;
+    --text-primary: #e6f1ff;
+    --text-secondary: #a8c1de;
+    --text-tertiary: #6b89ad;
+    --cyan: #67e8f9;
+    --teal: #2dd4bf;
+    --safe: #34d399;
+    --caution: #fbbf24;
+    --danger: #f87171;
+  }
+  body {
+    background:
+      radial-gradient(1200px 800px at 70% -10%, rgba(45, 212, 191, 0.18), transparent 60%),
+      radial-gradient(900px 700px at -10% 110%, rgba(99, 102, 241, 0.22), transparent 60%),
+      linear-gradient(180deg, #061a35 0%, #03132a 60%, #020a1a 100%);
+    color: var(--text-primary);
+    font-family: 'Pretendard Variable', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* 파도 SVG (배경 떠다니기) */
+  .wave-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.18;
+  }
+  .wave-bg svg { width: 100%; height: 100%; }
+
+  .glass {
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+    backdrop-filter: blur(22px) saturate(1.2);
+    -webkit-backdrop-filter: blur(22px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 24px 64px -32px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .glass-inset {
+    background: rgba(2, 13, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .pill {
+    background: rgba(45, 212, 191, 0.15);
+    color: #5eead4;
+    border: 1px solid rgba(45, 212, 191, 0.3);
+  }
+
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 8px; }
+
+  .gauge-shimmer {
+    animation: shimmer 3.5s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+  }
+  .float-y {
+    animation: floatY 6s ease-in-out infinite;
+  }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body class="antialiased">
+  <!-- 배경 파도 -->
+  <div class="wave-bg" aria-hidden="true">
+    <svg viewBox="0 0 1440 600" preserveAspectRatio="none">
+      <path d="M0,300 C240,260 480,340 720,300 C960,260 1200,340 1440,300 L1440,600 L0,600 Z"
+            fill="#67e8f9"/>
+      <path d="M0,360 C240,320 480,400 720,360 C960,320 1200,400 1440,360 L1440,600 L0,600 Z"
+            fill="#2dd4bf" opacity="0.6"/>
+      <path d="M0,420 C240,380 480,460 720,420 C960,380 1200,460 1440,420 L1440,600 L0,600 Z"
+            fill="#1e3a8a" opacity="0.7"/>
+    </svg>
+  </div>
+
+  <main class="relative z-10 max-w-3xl mx-auto px-4 py-8 sm:py-12" role="main">
+
+    <!-- 헤더 -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <p class="text-[11px] uppercase tracking-widest text-cyan-300/70">해양 관측</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white mt-1">
+          부산 · 해운대
+        </h1>
+      </div>
+      <div class="text-right text-xs text-[var(--text-tertiary)]">
+        <p class="num">2026.05.06</p>
+        <p class="num">15:24 KST</p>
+      </div>
+    </header>
+
+    <!-- 메인 카드: 파고 게이지 -->
+    <article class="glass rounded-3xl p-6 sm:p-8" aria-labelledby="wave-heading">
+      <div class="flex items-center justify-between mb-3">
+        <h2 id="wave-heading" class="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+          현재 파고
+        </h2>
+        <span class="pill px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+          잔잔
+        </span>
+      </div>
+
+      <div class="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8">
+        <!-- 파고 게이지 (반원 0~5m) -->
+        <div class="relative shrink-0" style="width: 200px;">
+          <svg viewBox="0 0 200 130" class="w-full h-auto block"
+               role="meter" aria-valuenow="1.4" aria-valuemin="0" aria-valuemax="5"
+               aria-label="파고 1.4미터, 잔잔 등급, 풍랑주의보 기준 3미터">
+            <title>파고 1.4m — 잔잔</title>
+            <defs>
+              <linearGradient id="wave-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="60%" stop-color="#fbbf24"/>
+                <stop offset="100%" stop-color="#f87171"/>
+              </linearGradient>
+            </defs>
+            <!-- 트랙 (반원: r=80, 중심 100,100) -->
+            <path d="M 20,100 A 80,80 0 0 1 180,100"
+                  fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+            <!-- 등급 그라데이션 트랙 (참조용 얇게) -->
+            <path d="M 20,100 A 80,80 0 0 1 180,100"
+                  fill="none" stroke="url(#wave-grad)" stroke-width="3" stroke-linecap="round"
+                  opacity="0.45"/>
+            <!-- 진행 (1.4/5 = 28%) -->
+            <!-- 반원 둘레 = π * 80 = 251.33. dasharray = 251.33 * 0.28 = 70.4 -->
+            <path d="M 20,100 A 80,80 0 0 1 180,100"
+                  fill="none" stroke="#5eead4" stroke-width="14" stroke-linecap="round"
+                  stroke-dasharray="70.4 251.33"
+                  style="transition: stroke-dasharray 600ms ease-out;"/>
+            <!-- 임계 마커: 1m (good→caution) -->
+            <!-- 1/5=20%, angle=180-36=144°, x=100+80cos(144°)=35.3, y=100-80sin(144°)=53 -->
+            <g>
+              <line x1="35.3" y1="100" x2="35.3" y2="92"
+                    stroke="#fbbf24" stroke-width="2" opacity="0.7"/>
+              <text x="35.3" y="118" text-anchor="middle" font-size="9"
+                    fill="#fbbf24" class="num">1m</text>
+            </g>
+            <!-- 임계 마커: 3m (caution→danger 풍랑주의보) -->
+            <!-- 3/5=60%, angle=180-108=72°, x=100+80cos(72°)=124.7, y=100-80sin(72°)=23.9 -->
+            <g>
+              <line x1="124.7" y1="23.9" x2="129.6" y2="17.6"
+                    stroke="#f87171" stroke-width="2" opacity="0.85"/>
+              <text x="138" y="22" text-anchor="start" font-size="9"
+                    fill="#fca5a5" class="num">3m 풍랑</text>
+            </g>
+            <!-- 인디케이터 끝 점: 1.4/5 → angle=180-50.4=129.6°, x=100+80cos(129.6°)=49.0, y=100-80sin(129.6°)=38.4 -->
+            <circle cx="49.0" cy="38.4" r="9" fill="#03132a" stroke="#5eead4" stroke-width="3"/>
+            <circle cx="49.0" cy="38.4" r="4" fill="#5eead4" class="gauge-shimmer"/>
+          </svg>
+          <div class="absolute inset-x-0 bottom-0 text-center">
+            <p class="num text-5xl font-extralight text-white leading-none"
+               style="letter-spacing:-0.03em;">
+              1.4<span class="text-xl text-cyan-200/70 ml-0.5">m</span>
+            </p>
+            <p class="text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mt-1">SIG. 파고</p>
+          </div>
+        </div>
+
+        <!-- 보조 메트릭 -->
+        <dl class="flex-1 grid grid-cols-2 gap-3 w-full" role="group" aria-label="보조 해양 지표">
+          <div class="glass-inset rounded-xl p-3.5">
+            <dt class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">주기</dt>
+            <dd class="num text-2xl font-light text-white mt-1">
+              6.2<span class="text-sm text-[var(--text-tertiary)] ml-0.5">s</span>
+            </dd>
+          </div>
+          <div class="glass-inset rounded-xl p-3.5">
+            <dt class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">수온</dt>
+            <dd class="num text-2xl font-light text-cyan-200 mt-1">
+              17.1<span class="text-sm text-[var(--text-tertiary)] ml-0.5">°C</span>
+            </dd>
+          </div>
+          <div class="glass-inset rounded-xl p-3.5">
+            <dt class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">해풍</dt>
+            <dd class="num text-2xl font-light text-white mt-1">
+              4.2<span class="text-sm text-[var(--text-tertiary)] ml-0.5">m/s</span>
+            </dd>
+            <p class="text-[10px] text-cyan-300/70 mt-0.5">남서 235°</p>
+          </div>
+          <div class="glass-inset rounded-xl p-3.5">
+            <dt class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">특보</dt>
+            <dd class="text-base font-medium text-emerald-300 mt-1">
+              없음
+            </dd>
+            <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">정상 운항</p>
+          </div>
+        </dl>
+      </div>
+
+      <p class="mt-5 text-sm text-cyan-100/85 leading-relaxed border-l-2 border-cyan-400/40 pl-3">
+        잔잔 — 일반 해수욕 가능, 서핑 적합. 파주기 6초대 부드러운 너울.
+      </p>
+    </article>
+
+    <!-- 조위 + 윈드로즈 -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4">
+
+      <!-- 조위 라인 -->
+      <article class="md:col-span-3 glass rounded-3xl p-5 sm:p-6" aria-labelledby="tide-heading">
+        <header class="flex items-baseline justify-between mb-3">
+          <h2 id="tide-heading" class="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+            조위 · 12시간
+          </h2>
+          <p class="text-[11px] text-[var(--text-tertiary)]">
+            <span class="num">12:14</span> 간조 · <span class="num">18:42</span> 만조
+          </p>
+        </header>
+
+        <svg viewBox="0 0 360 180" class="w-full h-auto block"
+             role="img" aria-label="조위 12시간 곡선, 만조 272cm 18시 42분, 간조 42cm 12시 14분">
+          <title>조위 12시간 곡선</title>
+          <defs>
+            <linearGradient id="tide-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#5eead4" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.04"/>
+            </linearGradient>
+          </defs>
+          <!-- 격자 -->
+          <g stroke="rgba(255,255,255,0.06)" stroke-dasharray="2 4">
+            <line x1="40" y1="30"  x2="350" y2="30"/>
+            <line x1="40" y1="70"  x2="350" y2="70"/>
+            <line x1="40" y1="110" x2="350" y2="110"/>
+            <line x1="40" y1="150" x2="350" y2="150"/>
+          </g>
+          <!-- y 라벨 (cm: 0~300) -->
+          <g font-size="9" fill="#6b89ad" text-anchor="end" class="num">
+            <text x="36" y="34">300</text>
+            <text x="36" y="74">200</text>
+            <text x="36" y="114">100</text>
+            <text x="36" y="154">0</text>
+          </g>
+          <!-- 0cm baseline -->
+          <line x1="40" y1="150" x2="350" y2="150"
+                stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+
+          <!-- 조위 path: 14개 포인트, x=40~350, y=30(300cm)~150(0cm) -->
+          <!-- 매핑 y = 150 - (cm/300)*120 -->
+          <path id="tide-area"
+                fill="url(#tide-grad)" stroke="none"/>
+          <path id="tide-line"
+                fill="none" stroke="#67e8f9" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- 만조/간조 마커 -->
+          <g id="tide-markers"></g>
+
+          <!-- 시간 라벨 -->
+          <g font-size="9" fill="#6b89ad" text-anchor="middle" class="num">
+            <text x="40"  y="172">12시</text>
+            <text x="121" y="172">15시</text>
+            <text x="202" y="172">18시</text>
+            <text x="283" y="172">21시</text>
+            <text x="350" y="172">24시</text>
+          </g>
+        </svg>
+      </article>
+
+      <!-- 윈드로즈 미니 -->
+      <article class="md:col-span-2 glass rounded-3xl p-5 sm:p-6 flex flex-col" aria-labelledby="wind-heading">
+        <header class="flex items-baseline justify-between mb-3">
+          <h2 id="wind-heading" class="text-sm font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+            해상풍
+          </h2>
+          <p class="text-[11px] text-[var(--text-tertiary)]">
+            보퍼트 <span class="num text-cyan-200">3</span>
+          </p>
+        </header>
+        <div class="flex-1 flex items-center justify-center">
+          <svg viewBox="0 0 180 180" class="w-full max-w-[180px] h-auto float-y"
+               role="img" aria-label="해상풍 윈드로즈, 남서 235도 4.2미터/초">
+            <title>해상풍 남서 235°</title>
+            <!-- 동심원 -->
+            <g stroke="rgba(255,255,255,0.12)" fill="none" stroke-dasharray="2 4">
+              <circle cx="90" cy="90" r="30"/>
+              <circle cx="90" cy="90" r="55"/>
+              <circle cx="90" cy="90" r="78"/>
+            </g>
+            <!-- 16방위 보조선 -->
+            <g stroke="rgba(255,255,255,0.06)" stroke-width="0.5">
+              <line x1="90" y1="12" x2="90" y2="168"/>
+              <line x1="12" y1="90" x2="168" y2="90"/>
+              <line x1="34" y1="34" x2="146" y2="146"/>
+              <line x1="146" y1="34" x2="34" y2="146"/>
+            </g>
+            <!-- 방위 라벨 -->
+            <g font-size="10" font-weight="600" fill="#a8c1de" text-anchor="middle">
+              <text x="90" y="9">N</text>
+              <text x="174" y="93">E</text>
+              <text x="90" y="178">S</text>
+              <text x="6" y="93">W</text>
+            </g>
+            <!-- 풍향 화살표: 남서(235°) -->
+            <!-- 235°에서 부는 바람 → 화살표 머리는 바람 진행방향(반대 = 55°)을 향함 -->
+            <!-- 화살표 시작점은 SW 가장자리 (235° 방향), 끝점은 중심을 지나 반대편 -->
+            <!-- 시작 (235°): x=90+70*sin(235°)=90+70*(-0.819)=32.7, y=90-70*cos(235°)=90-70*(-0.574)=130.2 -->
+            <!-- 끝 (55°): x=90+70*sin(55°)=90+70*(0.819)=147.3, y=90-70*cos(55°)=90-70*(0.574)=49.8 -->
+            <defs>
+              <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#5eead4"/>
+              </marker>
+            </defs>
+            <line x1="32.7" y1="130.2" x2="147.3" y2="49.8"
+                  stroke="#5eead4" stroke-width="3" stroke-linecap="round"
+                  marker-end="url(#arrow-head)"/>
+            <!-- 강도 부채꼴 (남서 우세 풍역) -->
+            <path d="M 90,90 L 32.7,130.2 A 70,70 0 0 1 12.4,75.7 Z"
+                  fill="#5eead4" opacity="0.18"/>
+            <!-- 중앙 표시 -->
+            <circle cx="90" cy="90" r="3.5" fill="#67e8f9"/>
+          </svg>
+        </div>
+        <div class="text-center mt-2">
+          <p class="num text-2xl font-light text-white">
+            4.2<span class="text-xs text-[var(--text-tertiary)] ml-0.5">m/s</span>
+          </p>
+          <p class="text-[11px] text-cyan-200/80 mt-0.5">남서 (235°) · 산들바람</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="mt-6 flex items-center justify-between text-[10px] text-[var(--text-tertiary)] px-2">
+      <span>국립해양조사원 · 기상청 해상특보</span>
+      <span class="num">SCHEMA v1.0</span>
+    </footer>
+  </main>
+
+  <script>
+    // 03_dataviz_samples.json `tide_12h`
+    const tide = [
+      { time: "12:14", cm:  42, type: "간조" },
+      { time: "13:00", cm:  78 },
+      { time: "14:00", cm: 142 },
+      { time: "15:00", cm: 198 },
+      { time: "16:00", cm: 240 },
+      { time: "17:00", cm: 264 },
+      { time: "18:00", cm: 268 },
+      { time: "18:42", cm: 272, type: "만조" },
+      { time: "19:00", cm: 260 },
+      { time: "20:00", cm: 222 },
+      { time: "21:00", cm: 168 },
+      { time: "22:00", cm: 112 },
+      { time: "23:00", cm:  68 },
+      { time: "00:00", cm:  44, type: "간조" },
+    ];
+
+    // x: 40..350, y = 150 - (cm/300)*120
+    const minMin = 12 + 14/60; // 12:14 = 12.233
+    const maxMin = 24;          // 24:00
+    const span = maxMin - minMin;
+
+    function timeToMin(t) {
+      const [h, m] = t.split(':').map(Number);
+      const hh = h === 0 ? 24 : h;
+      return hh + m / 60;
+    }
+    function px(t) {
+      return 40 + ((timeToMin(t) - minMin) / span) * 310;
+    }
+    function py(cm) {
+      return 150 - (cm / 300) * 120;
+    }
+
+    const pts = tide.map(t => `${px(t.time).toFixed(1)},${py(t.cm).toFixed(1)}`);
+    document.getElementById('tide-line').setAttribute('d', 'M ' + pts.join(' L '));
+    const areaPath = 'M ' + pts.join(' L ') + ` L ${px('00:00').toFixed(1)},150 L ${px('12:14').toFixed(1)},150 Z`;
+    document.getElementById('tide-area').setAttribute('d', areaPath);
+
+    const markers = document.getElementById('tide-markers');
+    tide.filter(t => t.type).forEach(t => {
+      const x = px(t.time), y = py(t.cm);
+      const isHigh = t.type === '만조';
+      const color = isHigh ? '#5eead4' : '#fde68a';
+
+      const cir = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      cir.setAttribute('cx', x); cir.setAttribute('cy', y); cir.setAttribute('r', 4.5);
+      cir.setAttribute('fill', '#03132a'); cir.setAttribute('stroke', color); cir.setAttribute('stroke-width', 2);
+      markers.appendChild(cir);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', x);
+      txt.setAttribute('y', isHigh ? y - 10 : y + 14);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('font-size', '9');
+      txt.setAttribute('fill', color);
+      txt.classList.add('num');
+      txt.textContent = `${t.type} ${t.cm}cm`;
+      markers.appendChild(txt);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>시간별 예보 · 서울 · 향후 24시간</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+  tailwind.config = { darkMode: 'class' };
+</script>
+<style>
+  :root {
+    --w-rain: #0ea5e9;
+    --w-rain-heavy: #1d4ed8;
+    --w-night-clear: #4338ca;
+    --w-sunny: #f59e0b;
+    --w-partly-cloudy: #38bdf8;
+    --w-cloudy: #64748b;
+    --bg-base: #020617;
+    --bg-surface: #0f172a;
+    --bg-elevated: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border: #334155;
+    --border-strong: #475569;
+    --focus-ring: #60a5fa;
+    --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  }
+  html, body {
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum";
+    background: #020617;
+  }
+  body {
+    background-image:
+      radial-gradient(1200px 700px at 10% -10%, rgba(14, 165, 233, 0.32), transparent 60%),
+      radial-gradient(900px 600px at 110% 20%, rgba(67, 56, 202, 0.45), transparent 60%),
+      radial-gradient(800px 600px at 50% 110%, rgba(29, 78, 216, 0.35), transparent 60%),
+      linear-gradient(180deg, #020617 0%, #0a1228 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .glass {
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(28px) saturate(1.1);
+    -webkit-backdrop-filter: blur(28px) saturate(1.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 30px 60px -20px rgba(0, 0, 0, 0.55),
+      0 8px 24px -8px rgba(0, 0, 0, 0.45);
+  }
+  .glass-soft {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .strip-scroll::-webkit-scrollbar { height: 6px; }
+  .strip-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 999px; }
+  .strip-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 999px; }
+  .hour-cell:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+  .pill-now {
+    background: linear-gradient(135deg, rgba(14,165,233,0.35), rgba(67,56,202,0.35));
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    box-shadow: 0 8px 24px -10px rgba(14, 165, 233, 0.55);
+  }
+  /* ApexCharts 다크 톤 보정 */
+  .apexcharts-tooltip {
+    background: rgba(15, 23, 42, 0.92) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: #f8fafc !important;
+    font-family: var(--font-sans) !important;
+  }
+  .apexcharts-tooltip-title {
+    background: rgba(15, 23, 42, 0.92) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  }
+  .apexcharts-xaxistooltip, .apexcharts-yaxistooltip { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body class="text-slate-100">
+
+<main class="max-w-6xl mx-auto p-4 md:p-8">
+  <!-- 헤더 -->
+  <header class="flex items-center justify-between mb-6 md:mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl glass-soft flex items-center justify-center" aria-hidden="true">
+        <svg class="w-5 h-5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-400">FORECAST · HOURLY</p>
+        <h1 class="text-xl md:text-2xl font-semibold text-slate-50">서울 · 향후 24시간</h1>
+      </div>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-slate-400 tabular-nums">2026.05.06 15:24 KST</p>
+      <p class="text-[10px] text-slate-500">기상청 · 자동 갱신</p>
+    </div>
+  </header>
+
+  <!-- 메인 글래스 카드 -->
+  <section class="glass rounded-3xl p-5 md:p-8" aria-label="시간별 기온 및 강수 예보">
+    <!-- 상단 요약 -->
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+      <div>
+        <p class="text-[11px] uppercase tracking-widest text-sky-300/80">지금 15시</p>
+        <p class="mt-1 flex items-baseline gap-3">
+          <span class="text-6xl md:text-7xl font-extralight tabular-nums leading-none text-slate-50">22.4<span class="text-2xl text-slate-400 ml-1">°C</span></span>
+          <span class="text-sm md:text-base text-slate-300">부분 흐림 · 체감 21.8°</span>
+        </p>
+        <p class="mt-2 text-sm text-slate-400">오후 늦게부터 비, 우산 준비. 야간 기온 큰 폭 하강.</p>
+      </div>
+      <!-- 토글 (시간 단위) -->
+      <div role="tablist" aria-label="표시 단위" class="glass-soft rounded-full p-1 inline-flex text-xs">
+        <button role="tab" aria-selected="true" class="px-3 py-1.5 rounded-full bg-white/10 text-slate-100">기온/강수</button>
+        <button role="tab" aria-selected="false" class="px-3 py-1.5 rounded-full text-slate-300 hover:text-slate-100">바람/습도</button>
+      </div>
+    </div>
+
+    <!-- HourlyStrip (가로 스크롤) -->
+    <div class="relative">
+      <div class="strip-scroll overflow-x-auto -mx-2 px-2 pb-2">
+        <ul id="hourly-strip" class="flex gap-2 min-w-max" role="list" aria-label="24시간 예보 스트립"></ul>
+      </div>
+      <!-- 좌우 페이드 오버레이 -->
+      <div aria-hidden="true" class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[rgba(15,23,42,0.6)] to-transparent rounded-l-3xl"></div>
+      <div aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[rgba(15,23,42,0.6)] to-transparent rounded-r-3xl"></div>
+    </div>
+
+    <!-- 기온 영역 차트 -->
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div class="lg:col-span-2 glass-soft rounded-2xl p-4 md:p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-200">기온 추이 <span class="text-xs text-slate-400 font-normal">· °C</span></h2>
+          <div class="flex items-center gap-3 text-[11px] text-slate-400">
+            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--w-rain)"></span>주간</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--w-night-clear)"></span>야간</span>
+          </div>
+        </div>
+        <div id="hourly_temp_chart" class="w-full h-[220px] md:h-[260px]" role="img" aria-label="향후 24시간 기온 추이 영역 차트, 최저 13.4도 최고 25.1도"></div>
+      </div>
+
+      <!-- 강수확률 도트 + 메타 -->
+      <div class="glass-soft rounded-2xl p-4 md:p-5 flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-semibold text-slate-200">강수확률</h2>
+          <span class="text-[11px] text-slate-400 tabular-nums">최대 80% · 21시</span>
+        </div>
+        <!-- PrecipitationDots -->
+        <div id="precip-dots" class="flex items-end gap-1.5 flex-wrap py-2" role="list" aria-label="시간별 강수확률 도트 차트"></div>
+        <!-- 시간 라벨 (3시간 간격) -->
+        <div class="mt-2 grid grid-cols-8 text-[10px] text-slate-500 tabular-nums">
+          <span>15</span><span>18</span><span>21</span><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span>
+        </div>
+        <!-- 범례 -->
+        <ul class="mt-4 space-y-1.5 text-[11px] text-slate-300">
+          <li class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-slate-500"></span><span class="flex-1">낮음</span><span class="text-slate-500 tabular-nums">0~30%</span></li>
+          <li class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-sky-300"></span><span class="flex-1">보통</span><span class="text-slate-500 tabular-nums">31~60%</span></li>
+          <li class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-sky-500"></span><span class="flex-1">높음</span><span class="text-slate-500 tabular-nums">61~80%</span></li>
+          <li class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-full bg-blue-700"></span><span class="flex-1">매우높음</span><span class="text-slate-500 tabular-nums">81~100%</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 풍속 Sparkline + 메트릭 셀 -->
+    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <article class="glass-soft rounded-xl p-3.5" role="group" aria-label="현재 풍속">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">풍속 24h</p>
+        <p class="mt-1 text-xl font-light tabular-nums text-slate-100">4.2<span class="text-xs text-slate-400 ml-1">m/s</span></p>
+        <svg viewBox="0 0 100 30" class="w-full h-7 mt-1" preserveAspectRatio="none" role="img" aria-label="풍속 24시간 추이 스파크라인">
+          <defs>
+            <linearGradient id="wind-spark" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path id="wind-spark-area" fill="url(#wind-spark)" d=""/>
+          <path id="wind-spark-line" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d=""/>
+        </svg>
+      </article>
+      <article class="glass-soft rounded-xl p-3.5" role="group" aria-label="습도">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">습도</p>
+        <p class="mt-1 text-xl font-light tabular-nums text-slate-100">58<span class="text-xs text-slate-400 ml-1">%</span></p>
+        <p class="text-[10px] text-slate-500 mt-1">야간 88% 상승</p>
+      </article>
+      <article class="glass-soft rounded-xl p-3.5" role="group" aria-label="체감 최저">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">체감 최저</p>
+        <p class="mt-1 text-xl font-light tabular-nums text-slate-100">12.8<span class="text-xs text-slate-400 ml-1">°C</span></p>
+        <p class="text-[10px] text-slate-500 mt-1">새벽 05시</p>
+      </article>
+      <article class="glass-soft rounded-xl p-3.5" role="group" aria-label="강수 누적">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">강수 누적 (12h)</p>
+        <p class="mt-1 text-xl font-light tabular-nums text-slate-100">18.6<span class="text-xs text-slate-400 ml-1">mm</span></p>
+        <p class="text-[10px] text-sky-300 mt-1">보통 강도</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 푸터 메타 -->
+  <footer class="mt-6 flex items-center justify-between text-[11px] text-slate-500">
+    <span>출처 · 기상청 단기예보</span>
+    <span class="tabular-nums">갱신 14:23 · 다음 15:23</span>
+  </footer>
+</main>
+
+<script>
+  // ============ 더미 데이터 (03_dataviz_samples.json: hourly_24h) ============
+  const HOURLY = [
+    { hour: "15", temp_c: 22.4, precip_prob_pct: 20, icon: "partly_cloudy", wind_ms: 2.4, humidity_pct: 58, feels_like_c: 21.8 },
+    { hour: "16", temp_c: 22.7, precip_prob_pct: 15, icon: "partly_cloudy", wind_ms: 2.6, humidity_pct: 56, feels_like_c: 22.1 },
+    { hour: "17", temp_c: 22.1, precip_prob_pct: 25, icon: "partly_cloudy", wind_ms: 2.8, humidity_pct: 60, feels_like_c: 21.5 },
+    { hour: "18", temp_c: 20.6, precip_prob_pct: 35, icon: "cloudy",        wind_ms: 3.0, humidity_pct: 64, feels_like_c: 20.1 },
+    { hour: "19", temp_c: 18.9, precip_prob_pct: 50, icon: "cloudy",        wind_ms: 3.2, humidity_pct: 70, feels_like_c: 18.4 },
+    { hour: "20", temp_c: 17.8, precip_prob_pct: 70, icon: "rain",          wind_ms: 3.4, humidity_pct: 78, feels_like_c: 17.2 },
+    { hour: "21", temp_c: 16.9, precip_prob_pct: 80, icon: "rain",          wind_ms: 3.6, humidity_pct: 82, feels_like_c: 16.3 },
+    { hour: "22", temp_c: 16.2, precip_prob_pct: 75, icon: "rain",          wind_ms: 3.5, humidity_pct: 84, feels_like_c: 15.6 },
+    { hour: "23", temp_c: 15.6, precip_prob_pct: 60, icon: "rain",          wind_ms: 3.2, humidity_pct: 85, feels_like_c: 15.0 },
+    { hour: "00", temp_c: 15.1, precip_prob_pct: 45, icon: "cloudy",        wind_ms: 2.9, humidity_pct: 86, feels_like_c: 14.5 },
+    { hour: "01", temp_c: 14.7, precip_prob_pct: 35, icon: "cloudy",        wind_ms: 2.6, humidity_pct: 86, feels_like_c: 14.1 },
+    { hour: "02", temp_c: 14.3, precip_prob_pct: 25, icon: "cloudy",        wind_ms: 2.4, humidity_pct: 87, feels_like_c: 13.7 },
+    { hour: "03", temp_c: 13.9, precip_prob_pct: 20, icon: "night_clear",   wind_ms: 2.2, humidity_pct: 87, feels_like_c: 13.3 },
+    { hour: "04", temp_c: 13.6, precip_prob_pct: 15, icon: "night_clear",   wind_ms: 2.0, humidity_pct: 88, feels_like_c: 13.0 },
+    { hour: "05", temp_c: 13.4, precip_prob_pct: 10, icon: "night_clear",   wind_ms: 1.9, humidity_pct: 88, feels_like_c: 12.8 },
+    { hour: "06", temp_c: 13.8, precip_prob_pct: 10, icon: "clear",         wind_ms: 2.0, humidity_pct: 84, feels_like_c: 13.2 },
+    { hour: "07", temp_c: 15.2, precip_prob_pct: 10, icon: "clear",         wind_ms: 2.2, humidity_pct: 78, feels_like_c: 14.8 },
+    { hour: "08", temp_c: 17.1, precip_prob_pct: 10, icon: "clear",         wind_ms: 2.5, humidity_pct: 70, feels_like_c: 16.8 },
+    { hour: "09", temp_c: 19.4, precip_prob_pct: 10, icon: "clear",         wind_ms: 2.8, humidity_pct: 62, feels_like_c: 19.0 },
+    { hour: "10", temp_c: 21.6, precip_prob_pct:  5, icon: "clear",         wind_ms: 3.1, humidity_pct: 55, feels_like_c: 21.2 },
+    { hour: "11", temp_c: 23.2, precip_prob_pct:  5, icon: "clear",         wind_ms: 3.3, humidity_pct: 50, feels_like_c: 22.8 },
+    { hour: "12", temp_c: 24.5, precip_prob_pct: 10, icon: "partly_cloudy", wind_ms: 3.5, humidity_pct: 47, feels_like_c: 24.0 },
+    { hour: "13", temp_c: 25.1, precip_prob_pct: 15, icon: "partly_cloudy", wind_ms: 3.7, humidity_pct: 46, feels_like_c: 24.5 },
+    { hour: "14", temp_c: 25.0, precip_prob_pct: 20, icon: "partly_cloudy", wind_ms: 3.6, humidity_pct: 48, feels_like_c: 24.4 }
+  ];
+
+  // ============ 컨디션 SVG 아이콘 (24×24) ============
+  const ICONS = {
+    clear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`,
+    partly_cloudy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 2v1M8 13v1M2 8h1M13 8h1M3.76 3.76l.71.71M11.53 11.53l.71.71M3.76 12.24l.71-.71M11.53 4.47l.71-.71"/><path d="M14 18a4 4 0 1 0-3.6-5.7A3.5 3.5 0 0 0 8 18z"/></svg>`,
+    cloudy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 17a4 4 0 0 0-3.6-5.7A5.5 5.5 0 0 0 6 14H6a3.5 3.5 0 0 0 0 7h10a4 4 0 0 0 0-4z"/></svg>`,
+    rain: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13a4 4 0 0 0-3.6-5.7A5.5 5.5 0 0 0 6 10a3.5 3.5 0 0 0 0 7h10a4 4 0 0 0 0-4z"/><path d="M8 19l-1 3M12 19l-1 3M16 19l-1 3"/></svg>`,
+    night_clear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 13.5A9 9 0 1 1 10.5 3a7 7 0 0 0 10.5 10.5z"/></svg>`
+  };
+
+  // 시간대별 컬러 토큰: 18~05시 → night, 06~17 → day. rain 은 별도.
+  const ICON_COLOR = {
+    clear: '#fbbf24',
+    partly_cloudy: '#7dd3fc',
+    cloudy: '#cbd5e1',
+    rain: '#38bdf8',
+    night_clear: '#a5b4fc'
+  };
+  const ICON_LABEL = {
+    clear: '맑음', partly_cloudy: '부분 흐림', cloudy: '흐림', rain: '비', night_clear: '맑은 밤'
+  };
+
+  // ============ HourlyStrip 렌더 ============
+  function renderStrip() {
+    const strip = document.getElementById('hourly-strip');
+    const html = HOURLY.map((h, idx) => {
+      const isNow = idx === 0;
+      const cellClass = isNow ? 'pill-now' : 'glass-soft';
+      const tempLabel = `${ICON_LABEL[h.icon]}, 기온 ${h.temp_c}도, 강수확률 ${h.precip_prob_pct}%`;
+      const dotColor = dotColorClass(h.precip_prob_pct);
+      const dotSize = dotSizeClass(h.precip_prob_pct);
+      return `
+        <li class="hour-cell flex-none w-[68px] md:w-[78px] rounded-2xl ${cellClass} p-2.5 text-center"
+            tabindex="0" role="listitem" aria-label="${h.hour}시 ${tempLabel}">
+          <p class="text-[11px] tabular-nums ${isNow ? 'text-sky-200' : 'text-slate-400'}">${isNow ? '지금' : h.hour + '시'}</p>
+          <div class="my-1.5 flex items-center justify-center h-7" style="color:${ICON_COLOR[h.icon]}" aria-hidden="true">
+            <span class="block w-7 h-7">${ICONS[h.icon]}</span>
+          </div>
+          <p class="text-base font-light tabular-nums text-slate-50">${h.temp_c.toFixed(0)}<span class="text-[10px] text-slate-400 ml-0.5">°</span></p>
+          <div class="mt-1.5 flex items-center justify-center gap-1">
+            <span class="${dotSize} rounded-full ${dotColor}" aria-hidden="true"></span>
+            <span class="text-[10px] tabular-nums text-slate-400">${h.precip_prob_pct}%</span>
+          </div>
+        </li>`;
+    }).join('');
+    strip.innerHTML = html;
+
+    // 키보드 좌우 화살표 탐색
+    const cells = strip.querySelectorAll('.hour-cell');
+    cells.forEach((cell, i) => {
+      cell.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && cells[i+1]) { cells[i+1].focus(); e.preventDefault(); }
+        if (e.key === 'ArrowLeft'  && cells[i-1]) { cells[i-1].focus(); e.preventDefault(); }
+      });
+    });
+  }
+
+  function dotColorClass(p) {
+    if (p < 31) return 'bg-slate-500';
+    if (p < 61) return 'bg-sky-300';
+    if (p < 81) return 'bg-sky-500';
+    return 'bg-blue-700';
+  }
+  function dotSizeClass(p) {
+    if (p < 31) return 'w-1.5 h-1.5';
+    if (p < 61) return 'w-2 h-2';
+    if (p < 81) return 'w-2.5 h-2.5';
+    return 'w-3 h-3';
+  }
+
+  // ============ PrecipitationDots ============
+  function renderPrecipDots() {
+    const wrap = document.getElementById('precip-dots');
+    const html = HOURLY.map((h, i) => {
+      const sizeMap = { sm: 'w-2 h-2', md: 'w-3 h-3', lg: 'w-4 h-4', xl: 'w-5 h-5' };
+      let size = sizeMap.sm, color = 'bg-slate-600';
+      if (h.precip_prob_pct >= 81) { size = sizeMap.xl; color = 'bg-blue-700'; }
+      else if (h.precip_prob_pct >= 61) { size = sizeMap.lg; color = 'bg-sky-500'; }
+      else if (h.precip_prob_pct >= 31) { size = sizeMap.md; color = 'bg-sky-300'; }
+      return `<span role="listitem" class="${size} rounded-full ${color}" title="${h.hour}시 ${h.precip_prob_pct}%" aria-label="${h.hour}시 강수확률 ${h.precip_prob_pct}퍼센트"></span>`;
+    }).join('');
+    wrap.innerHTML = html;
+  }
+
+  // ============ 풍속 Sparkline ============
+  function renderWindSparkline() {
+    const values = HOURLY.map(h => h.wind_ms);
+    const w = 100, h = 30, pad = 2;
+    const min = Math.min(...values), max = Math.max(...values);
+    const range = max - min || 1;
+    const stepX = (w - pad*2) / (values.length - 1);
+    const pts = values.map((v, i) => ({
+      x: pad + i * stepX,
+      y: pad + (1 - (v - min)/range) * (h - pad*2)
+    }));
+    const linePath = 'M ' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L ');
+    const areaPath = linePath + ` L ${pts.at(-1).x.toFixed(1)},${h} L ${pts[0].x.toFixed(1)},${h} Z`;
+    document.getElementById('wind-spark-line').setAttribute('d', linePath);
+    document.getElementById('wind-spark-area').setAttribute('d', areaPath);
+  }
+
+  // ============ ApexCharts 기온 영역 차트 ============
+  function renderTempChart() {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // 시간을 24h 시퀀스 위치로 환산. 야간(18~05시) 마커 색상 분기.
+    const isNight = (hh) => {
+      const n = parseInt(hh, 10);
+      return n >= 18 || n <= 5;
+    };
+    const series = [{
+      name: '기온',
+      data: HOURLY.map(h => ({ x: h.hour + '시', y: h.temp_c }))
+    }];
+
+    const opts = {
+      chart: {
+        type: 'area',
+        height: 260,
+        background: 'transparent',
+        foreColor: '#94a3b8',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: '"Pretendard Variable", sans-serif',
+        animations: { enabled: !reduced, easing: 'easeout', speed: 600 },
+        sparkline: { enabled: false }
+      },
+      series,
+      stroke: { curve: 'smooth', width: 2.5, colors: ['#38bdf8'] },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.45,
+          opacityTo: 0.02,
+          stops: [0, 100],
+          colorStops: [
+            { offset: 0, color: '#38bdf8', opacity: 0.45 },
+            { offset: 60, color: '#4338ca', opacity: 0.18 },
+            { offset: 100, color: '#0f172a', opacity: 0 }
+          ]
+        }
+      },
+      dataLabels: { enabled: false },
+      grid: {
+        borderColor: 'rgba(148,163,184,0.12)',
+        strokeDashArray: 3,
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        padding: { left: 4, right: 4, top: 0, bottom: 0 }
+      },
+      xaxis: {
+        type: 'category',
+        labels: {
+          rotate: 0,
+          style: { colors: '#64748b', fontSize: '10px' },
+          formatter: (v, _, idx) => {
+            // 3시간 간격만 라벨 표시
+            const i = HOURLY.findIndex(h => (h.hour + '시') === v);
+            return (i % 3 === 0) ? v : '';
+          }
+        },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        tooltip: { enabled: false }
+      },
+      yaxis: {
+        labels: {
+          style: { colors: '#64748b', fontSize: '10px' },
+          formatter: v => v.toFixed(0) + '°'
+        },
+        forceNiceScale: true
+      },
+      markers: {
+        size: 4,
+        strokeWidth: 0,
+        colors: HOURLY.map(h => isNight(h.hour) ? '#a5b4fc' : '#7dd3fc'),
+        hover: { sizeOffset: 2 }
+      },
+      tooltip: {
+        theme: 'dark',
+        custom: ({ dataPointIndex }) => {
+          const h = HOURLY[dataPointIndex];
+          return `
+            <div style="padding:8px 12px;font-family:Pretendard Variable,sans-serif;">
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">${h.hour}시 · ${ICON_LABEL[h.icon]}</div>
+              <div style="font-size:18px;color:#f8fafc;font-variant-numeric:tabular-nums;">${h.temp_c}°C</div>
+              <div style="font-size:11px;color:#7dd3fc;font-variant-numeric:tabular-nums;margin-top:2px;">체감 ${h.feels_like_c}° · 강수 ${h.precip_prob_pct}%</div>
+            </div>`;
+        }
+      },
+      annotations: {
+        yaxis: [{
+          y: HOURLY[0].temp_c,
+          borderColor: 'rgba(125,211,252,0.4)',
+          strokeDashArray: 4,
+          label: {
+            text: '현재 ' + HOURLY[0].temp_c + '°',
+            position: 'left',
+            offsetX: 60,
+            style: { color: '#7dd3fc', background: 'rgba(15,23,42,0.85)', fontSize: '10px' }
+          }
+        }]
+      },
+      legend: { show: false }
+    };
+
+    const chart = new ApexCharts(document.querySelector('#hourly_temp_chart'), opts);
+    chart.render();
+  }
+
+  // ============ 초기화 ============
+  document.addEventListener('DOMContentLoaded', () => {
+    renderStrip();
+    renderPrecipDots();
+    renderWindSparkline();
+    renderTempChart();
+  });
+</script>
+
+</body>
+</html>

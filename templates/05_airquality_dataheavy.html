@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>대기질 대시보드 · 서울 종로구 — Data Heavy</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Pretendard Variable"','Pretendard','-apple-system','BlinkMacSystemFont','system-ui','"Apple SD Gothic Neo"','"Noto Sans KR"','sans-serif'],
+          mono: ['"JetBrains Mono"','"D2Coding"','ui-monospace','SFMono-Regular','monospace']
+        }
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<style>
+  :root {
+    --bg-base:#ffffff; --bg-surface:#f8fafc; --bg-elevated:#f1f5f9;
+    --text-primary:#0f172a; --text-secondary:#334155; --text-tertiary:#64748b;
+    --border:#e2e8f0; --border-strong:#cbd5e1;
+    --focus-ring:#3b82f6;
+    /* Signal pairs (light) */
+    --sig-good-bg:#d1fae5;        --sig-good-text:#065f46;        --sig-good-solid:#10b981;
+    --sig-moderate-bg:#e0f2fe;    --sig-moderate-text:#0c4a6e;    --sig-moderate-solid:#0ea5e9;
+    --sig-caution-bg:#fef3c7;     --sig-caution-text:#78350f;     --sig-caution-solid:#f59e0b;
+    --sig-unhealthy-bg:#ffedd5;   --sig-unhealthy-text:#7c2d12;   --sig-unhealthy-solid:#f97316;
+    --sig-vunhealthy-bg:#fee2e2;  --sig-vunhealthy-text:#7f1d1d;  --sig-vunhealthy-solid:#ef4444;
+    --sig-hazardous-bg:#f3e8ff;   --sig-hazardous-text:#581c87;   --sig-hazardous-solid:#9333ea;
+  }
+  html.dark {
+    --bg-base:#020617; --bg-surface:#0f172a; --bg-elevated:#1e293b;
+    --text-primary:#f8fafc; --text-secondary:#cbd5e1; --text-tertiary:#94a3b8;
+    --border:#334155; --border-strong:#475569;
+    --focus-ring:#60a5fa;
+    --sig-good-bg:rgba(16,185,129,.18);    --sig-good-text:#6ee7b7;        --sig-good-solid:#34d399;
+    --sig-moderate-bg:rgba(14,165,233,.18); --sig-moderate-text:#7dd3fc;   --sig-moderate-solid:#38bdf8;
+    --sig-caution-bg:rgba(245,158,11,.18); --sig-caution-text:#fcd34d;    --sig-caution-solid:#fbbf24;
+    --sig-unhealthy-bg:rgba(249,115,22,.18); --sig-unhealthy-text:#fdba74; --sig-unhealthy-solid:#fb923c;
+    --sig-vunhealthy-bg:rgba(239,68,68,.18); --sig-vunhealthy-text:#fca5a5; --sig-vunhealthy-solid:#f87171;
+    --sig-hazardous-bg:rgba(147,51,234,.18); --sig-hazardous-text:#d8b4fe; --sig-hazardous-solid:#c084fc;
+  }
+  body {
+    font-family: "Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .panel-elev {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+    opacity: .35;
+  }
+  .apexcharts-tooltip {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,.25) !important;
+  }
+  .apexcharts-tooltip-title {
+    background: var(--bg-elevated) !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .data-row:nth-child(even) td { background: var(--bg-elevated); }
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="relative">
+  <div class="absolute inset-0 grid-bg pointer-events-none" aria-hidden="true"></div>
+
+  <main class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- Header / breadcrumb -->
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-[var(--border)]">
+      <div>
+        <p class="text-[11px] font-mono uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+          AIRKOREA / 대기환경 대시보드
+        </p>
+        <h1 class="mt-1.5 text-xl sm:text-2xl font-semibold text-[var(--text-primary)]">
+          대기질 종합 분석 · <span class="text-[var(--text-secondary)] font-medium">서울 종로구 측정소</span>
+        </h1>
+        <p class="mt-1 text-xs text-[var(--text-tertiary)] tabular-nums">
+          관측 2026-05-06 15:24 KST · 환경부 에어코리아 기준 · KHAI/PM2.5/PM10 4단계
+        </p>
+      </div>
+      <div class="flex items-center gap-2 self-start md:self-auto">
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border)]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          REAL-TIME
+        </span>
+        <button id="themeToggle" type="button"
+                class="w-9 h-9 rounded-md border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] transition-colors flex items-center justify-center"
+                aria-label="라이트/다크 모드 전환">
+          <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>
+          </svg>
+          <svg class="w-4 h-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top: KHAI hero + sub metrics -->
+    <section class="mt-5 grid grid-cols-12 gap-4" aria-label="통합대기환경지수 및 주요 오염물질">
+
+      <!-- KHAI gauge panel -->
+      <article class="panel p-5 sm:p-6 col-span-12 lg:col-span-5" aria-label="통합대기환경지수 KHAI">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-mono uppercase tracking-[0.18em] text-[var(--text-tertiary)]">KHAI · 통합대기환경지수</p>
+            <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">0–500 척도 · 환경부 4단계</p>
+          </div>
+          <span id="khaiChip" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                style="background:var(--sig-moderate-bg); color:var(--sig-moderate-text);"
+                aria-label="등급 보통">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:var(--sig-moderate-solid);"></span>
+            보통
+          </span>
+        </div>
+
+        <div class="mt-4 flex items-center gap-5 sm:gap-6">
+          <!-- Gauge ring -->
+          <div class="relative shrink-0" style="width:148px; height:148px;">
+            <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90"
+                 role="meter" aria-valuenow="92" aria-valuemin="0" aria-valuemax="500"
+                 aria-label="KHAI 92 보통 등급">
+              <circle cx="60" cy="60" r="50" fill="none"
+                      stroke="var(--bg-elevated)" stroke-width="10"/>
+              <circle id="khaiArc" cx="60" cy="60" r="50" fill="none"
+                      stroke="var(--sig-moderate-solid)" stroke-width="10"
+                      stroke-linecap="round"
+                      stroke-dasharray="0 314.16"
+                      style="transition: stroke-dasharray 600ms cubic-bezier(.4,0,.2,1);"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <p class="text-4xl font-extralight tabular-nums text-[var(--text-primary)] leading-none">92</p>
+              <p class="text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mt-1">/ 500</p>
+            </div>
+          </div>
+
+          <!-- Insight column -->
+          <div class="min-w-0 flex-1">
+            <p class="text-sm text-[var(--text-secondary)]">
+              <span class="font-medium text-[var(--text-primary)]">"보통 - 민감군 외 활동 가능"</span>
+            </p>
+            <ul class="mt-3 space-y-1.5 text-[12px] text-[var(--text-tertiary)]">
+              <li class="flex items-baseline gap-2">
+                <span class="w-1 h-1 rounded-full bg-current shrink-0 mt-1.5"></span>
+                <span>전일 대비 <span class="text-[var(--sig-unhealthy-text)] tabular-nums font-medium">+8</span> 악화</span>
+              </li>
+              <li class="flex items-baseline gap-2">
+                <span class="w-1 h-1 rounded-full bg-current shrink-0 mt-1.5"></span>
+                <span>주성분 PM10 (58 ㎍/㎥)</span>
+              </li>
+              <li class="flex items-baseline gap-2">
+                <span class="w-1 h-1 rounded-full bg-current shrink-0 mt-1.5"></span>
+                <span>다음 24h 예측 최고 <span class="tabular-nums">112</span> (나쁨)</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- AQI Index Bar -->
+        <div class="mt-5 sm:mt-6">
+          <div class="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-1.5">
+            <span>KHAI 위치</span><span class="tabular-nums">92 / 500</span>
+          </div>
+          <div class="relative w-full h-3 rounded-full overflow-hidden border border-[var(--border)]"
+               role="meter" aria-valuenow="92" aria-valuemin="0" aria-valuemax="500"
+               aria-label="KHAI 92 보통, 0~500 그라데이션 위치">
+            <div class="absolute inset-0"
+                 style="background: linear-gradient(to right,
+                        #34d399 0%, #34d399 10%,
+                        #38bdf8 10%, #38bdf8 20%,
+                        #fbbf24 20%, #fbbf24 50%,
+                        #fb923c 50%, #fb923c 75%,
+                        #ef4444 75%, #ef4444 90%,
+                        #9333ea 90%, #9333ea 100%);"></div>
+            <div class="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white border-2 border-slate-700 shadow-md"
+                 style="left: calc(18.4% - 7px);"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-[var(--text-tertiary)] mt-1 tabular-nums">
+            <span>0</span><span>50</span><span>100</span><span>250</span><span>400</span><span>500</span>
+          </div>
+          <div class="flex justify-between text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] mt-0.5">
+            <span>좋음</span><span class="text-[var(--sig-moderate-text)] font-semibold">보통</span><span>나쁨</span><span>매우나쁨</span><span>위험</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 6 metric cells -->
+      <article class="col-span-12 lg:col-span-7" aria-label="오염물질별 측정값">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 h-full">
+          <!-- PM2.5 -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="초미세먼지 PM 2.5">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">PM<sub class="text-[7px]">2.5</sub></p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-moderate-bg); color:var(--sig-moderate-text);">보통</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">32<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">㎍/㎥</span></p>
+            <div class="mt-auto pt-3">
+              <div id="spkPm25" class="w-full h-7" aria-label="PM2.5 24시간 추이"></div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums flex items-center gap-1.5">
+                <svg viewBox="0 0 8 8" class="w-2 h-2 text-[var(--sig-unhealthy-solid)]" aria-hidden="true"><path fill="currentColor" d="M4 0 L8 6 L0 6 Z"/></svg>
+                +33% vs 06:00
+              </p>
+            </div>
+          </div>
+
+          <!-- PM10 -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="미세먼지 PM 10">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">PM<sub class="text-[7px]">10</sub></p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-moderate-bg); color:var(--sig-moderate-text);">보통</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">58<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">㎍/㎥</span></p>
+            <div class="mt-auto pt-3">
+              <div id="spkPm10" class="w-full h-7" aria-label="PM10 24시간 추이"></div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums flex items-center gap-1.5">
+                <svg viewBox="0 0 8 8" class="w-2 h-2 text-[var(--sig-unhealthy-solid)]" aria-hidden="true"><path fill="currentColor" d="M4 0 L8 6 L0 6 Z"/></svg>
+                +28% vs 06:00
+              </p>
+            </div>
+          </div>
+
+          <!-- O3 -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="오존 O3">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">O<sub class="text-[7px]">3</sub></p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-moderate-bg); color:var(--sig-moderate-text);">보통</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">0.062<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">ppm</span></p>
+            <div class="mt-auto pt-3">
+              <div id="spkO3" class="w-full h-7" aria-label="오존 24시간 추이"></div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums flex items-center gap-1.5">
+                <svg viewBox="0 0 8 8" class="w-2 h-2 text-[var(--sig-good-solid)]" aria-hidden="true"><path fill="currentColor" d="M4 8 L0 2 L8 2 Z"/></svg>
+                정점 통과
+              </p>
+            </div>
+          </div>
+
+          <!-- NO2 -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="이산화질소 NO2">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">NO<sub class="text-[7px]">2</sub></p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-good-bg); color:var(--sig-good-text);">좋음</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">0.024<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">ppm</span></p>
+            <div class="mt-auto pt-3">
+              <div id="spkNo2" class="w-full h-7" aria-label="이산화질소 24시간 추이"></div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums flex items-center gap-1.5">
+                <svg viewBox="0 0 8 8" class="w-2 h-2 text-[var(--text-tertiary)]" aria-hidden="true"><rect fill="currentColor" x="0" y="3" width="8" height="2"/></svg>
+                안정
+              </p>
+            </div>
+          </div>
+
+          <!-- SO2 -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="아황산가스 SO2">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">SO<sub class="text-[7px]">2</sub></p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-good-bg); color:var(--sig-good-text);">좋음</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">0.004<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">ppm</span></p>
+            <div class="mt-auto pt-3">
+              <div class="w-full h-7 flex items-end gap-[2px]" aria-label="SO2 미니 막대 차트">
+                <span class="flex-1 rounded-sm" style="height:18%; background:var(--sig-good-solid); opacity:.5;"></span>
+                <span class="flex-1 rounded-sm" style="height:24%; background:var(--sig-good-solid); opacity:.55;"></span>
+                <span class="flex-1 rounded-sm" style="height:20%; background:var(--sig-good-solid); opacity:.5;"></span>
+                <span class="flex-1 rounded-sm" style="height:30%; background:var(--sig-good-solid); opacity:.6;"></span>
+                <span class="flex-1 rounded-sm" style="height:22%; background:var(--sig-good-solid); opacity:.55;"></span>
+                <span class="flex-1 rounded-sm" style="height:25%; background:var(--sig-good-solid); opacity:.6;"></span>
+                <span class="flex-1 rounded-sm" style="height:32%; background:var(--sig-good-solid); opacity:.7;"></span>
+                <span class="flex-1 rounded-sm" style="height:28%; background:var(--sig-good-solid); opacity:.65;"></span>
+              </div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums">기준 0.020 이내</p>
+            </div>
+          </div>
+
+          <!-- CO -->
+          <div class="panel-elev p-3.5 flex flex-col" role="group" aria-label="일산화탄소 CO">
+            <div class="flex items-start justify-between">
+              <p class="text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">CO</p>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                    style="background:var(--sig-good-bg); color:var(--sig-good-text);">좋음</span>
+            </div>
+            <p class="mt-2 text-3xl font-light tabular-nums leading-none">0.5<span class="text-[11px] text-[var(--text-tertiary)] ml-1 font-normal">ppm</span></p>
+            <div class="mt-auto pt-3">
+              <div class="relative w-full h-1.5 rounded-full bg-[var(--bg-surface)] overflow-hidden">
+                <div class="absolute inset-y-0 left-0 rounded-full" style="width:25%; background:var(--sig-good-solid);"></div>
+              </div>
+              <p class="mt-1 text-[10px] text-[var(--text-tertiary)] tabular-nums">최대 2.0 ppm 대비 25%</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Trend section: 24h sparklines for PM25/PM10/O3/NO2 -->
+    <section class="mt-4 panel p-5" aria-label="24시간 농도 추이 비교">
+      <div class="flex items-baseline justify-between mb-3 flex-wrap gap-2">
+        <div>
+          <h2 class="text-sm font-semibold text-[var(--text-primary)]">24시간 농도 추이 분석</h2>
+          <p class="text-[11px] text-[var(--text-tertiary)] tabular-nums">2026-05-05 15:00 → 2026-05-06 14:00 · 시간평균 24개 포인트</p>
+        </div>
+        <div class="flex items-center gap-3 text-[10px] text-[var(--text-tertiary)]">
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-px" style="background:var(--sig-moderate-solid);"></span>PM<sub>2.5</sub></span>
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-px" style="background:var(--sig-caution-solid);"></span>PM<sub>10</sub></span>
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-px" style="background:var(--sig-unhealthy-solid);"></span>O<sub>3</sub></span>
+          <span class="inline-flex items-center gap-1"><span class="w-2.5 h-px" style="background:var(--sig-good-solid);"></span>NO<sub>2</sub></span>
+        </div>
+      </div>
+      <div id="trendCombo" class="w-full h-[260px] sm:h-[300px]"></div>
+    </section>
+
+    <!-- Bottom: nearby stations + grade legend -->
+    <section class="mt-4 grid grid-cols-12 gap-4">
+
+      <!-- Nearby stations table -->
+      <article class="panel col-span-12 lg:col-span-8 overflow-hidden" aria-label="인근 측정소 비교">
+        <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-semibold">인근 측정소 비교 · 5개소</h2>
+            <p class="text-[11px] text-[var(--text-tertiary)]">반경 6km 이내 · 종로구 측정소 기준</p>
+          </div>
+          <span class="text-[10px] font-mono text-[var(--text-tertiary)] uppercase tracking-widest">SORT: KHAI ↓</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" role="table">
+            <thead class="bg-[var(--bg-elevated)] text-[10px] uppercase tracking-widest text-[var(--text-tertiary)]">
+              <tr>
+                <th scope="col" class="text-left font-medium px-4 py-2.5">측정소</th>
+                <th scope="col" class="text-right font-medium px-4 py-2.5 tabular-nums">거리 (km)</th>
+                <th scope="col" class="text-right font-medium px-4 py-2.5 tabular-nums">KHAI</th>
+                <th scope="col" class="text-right font-medium px-4 py-2.5 tabular-nums">PM<sub>2.5</sub> (㎍/㎥)</th>
+                <th scope="col" class="text-left font-medium px-4 py-2.5">등급</th>
+                <th scope="col" class="text-left font-medium px-4 py-2.5 hidden sm:table-cell">분포</th>
+              </tr>
+            </thead>
+            <tbody id="stationRows" class="text-[var(--text-primary)] divide-y divide-[var(--border)]"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- Grade legend / quick info -->
+      <article class="panel col-span-12 lg:col-span-4 p-5" aria-label="환경부 등급 범례">
+        <h2 class="text-sm font-semibold">환경부 4단계 등급</h2>
+        <p class="text-[11px] text-[var(--text-tertiary)] mt-0.5">PM<sub>2.5</sub> 기준 (㎍/㎥)</p>
+        <ul class="mt-4 space-y-2.5 text-sm">
+          <li class="flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background:var(--sig-good-solid);"></span>
+            <span class="flex-1">좋음</span>
+            <span class="font-mono text-xs text-[var(--text-tertiary)] tabular-nums">0~15</span>
+          </li>
+          <li class="flex items-center gap-3 px-2 py-1 -mx-2 rounded-md" style="background:var(--sig-moderate-bg); color:var(--sig-moderate-text);">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background:var(--sig-moderate-solid);"></span>
+            <span class="flex-1 font-medium">보통 · 현재</span>
+            <span class="font-mono text-xs tabular-nums">16~35</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background:var(--sig-unhealthy-solid);"></span>
+            <span class="flex-1">나쁨</span>
+            <span class="font-mono text-xs text-[var(--text-tertiary)] tabular-nums">36~75</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background:var(--sig-vunhealthy-solid);"></span>
+            <span class="flex-1">매우나쁨</span>
+            <span class="font-mono text-xs text-[var(--text-tertiary)] tabular-nums">76+</span>
+          </li>
+        </ul>
+
+        <hr class="my-4 border-[var(--border)]">
+
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)]">행동 권장</h3>
+        <ul class="mt-2 space-y-1.5 text-[12px] text-[var(--text-secondary)]">
+          <li class="flex gap-2"><span class="text-[var(--sig-moderate-solid)]">▸</span> 일반인 정상활동 가능</li>
+          <li class="flex gap-2"><span class="text-[var(--sig-caution-solid)]">▸</span> 민감군 장시간 외출 자제</li>
+          <li class="flex gap-2"><span class="text-[var(--sig-good-solid)]">▸</span> 환기 짧게(10분 이내)</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer class="mt-6 pt-4 border-t border-[var(--border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+      <span>SOURCE: AIRKOREA / 종로구 도시대기측정소</span>
+      <span>RENDER: 2026-05-06T15:24:00+09:00 · UI=data-heavy</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+  // =============== 더미 데이터 (samples.json: airquality_now / aqi_24h / aqi_stations_nearby) ===============
+  const NOW = {
+    khai: 92, khai_grade: "보통",
+    pm25_ugm3: 32, pm25_grade: "보통",
+    pm10_ugm3: 58, pm10_grade: "보통",
+    o3_ppm: 0.062, no2_ppm: 0.024, so2_ppm: 0.004, co_ppm: 0.5
+  };
+
+  const AQI_24H = [
+    { hour:"15", khai:78, pm25:24, pm10:38, o3:0.045, no2:0.022 },
+    { hour:"16", khai:82, pm25:26, pm10:41, o3:0.052, no2:0.024 },
+    { hour:"17", khai:88, pm25:30, pm10:46, o3:0.058, no2:0.026 },
+    { hour:"18", khai:92, pm25:32, pm10:50, o3:0.062, no2:0.028 },
+    { hour:"19", khai:95, pm25:33, pm10:54, o3:0.054, no2:0.030 },
+    { hour:"20", khai:98, pm25:35, pm10:58, o3:0.044, no2:0.032 },
+    { hour:"21", khai:96, pm25:34, pm10:56, o3:0.038, no2:0.030 },
+    { hour:"22", khai:88, pm25:32, pm10:52, o3:0.034, no2:0.028 },
+    { hour:"23", khai:84, pm25:30, pm10:48, o3:0.030, no2:0.026 },
+    { hour:"00", khai:78, pm25:28, pm10:44, o3:0.028, no2:0.024 },
+    { hour:"01", khai:72, pm25:25, pm10:40, o3:0.025, no2:0.022 },
+    { hour:"02", khai:68, pm25:23, pm10:36, o3:0.023, no2:0.020 },
+    { hour:"03", khai:64, pm25:21, pm10:32, o3:0.021, no2:0.018 },
+    { hour:"04", khai:60, pm25:20, pm10:30, o3:0.020, no2:0.018 },
+    { hour:"05", khai:58, pm25:19, pm10:28, o3:0.019, no2:0.018 },
+    { hour:"06", khai:64, pm25:22, pm10:32, o3:0.022, no2:0.020 },
+    { hour:"07", khai:78, pm25:28, pm10:42, o3:0.028, no2:0.024 },
+    { hour:"08", khai:92, pm25:34, pm10:52, o3:0.036, no2:0.028 },
+    { hour:"09", khai:102,pm25:38, pm10:60, o3:0.046, no2:0.030 },
+    { hour:"10", khai:108,pm25:42, pm10:68, o3:0.058, no2:0.032 },
+    { hour:"11", khai:112,pm25:44, pm10:72, o3:0.068, no2:0.030 },
+    { hour:"12", khai:110,pm25:42, pm10:70, o3:0.072, no2:0.028 },
+    { hour:"13", khai:102,pm25:38, pm10:64, o3:0.068, no2:0.026 },
+    { hour:"14", khai:96, pm25:34, pm10:58, o3:0.058, no2:0.024 }
+  ];
+
+  const STATIONS = [
+    { name:"종로구",   distance:0.0, khai:92, pm25:32, grade:"보통" },
+    { name:"중구",     distance:1.8, khai:96, pm25:34, grade:"보통" },
+    { name:"용산구",   distance:3.2, khai:88, pm25:30, grade:"보통" },
+    { name:"성동구",   distance:4.6, khai:102,pm25:38, grade:"나쁨" },
+    { name:"마포구",   distance:5.4, khai:84, pm25:28, grade:"보통" }
+  ];
+
+  // =============== Threshold mappers ===============
+  const KHAI_BANDS = [
+    { max:50,  bg:'var(--sig-good-bg)',       text:'var(--sig-good-text)',       solid:'var(--sig-good-solid)',       label:'좋음' },
+    { max:100, bg:'var(--sig-moderate-bg)',   text:'var(--sig-moderate-text)',   solid:'var(--sig-moderate-solid)',   label:'보통' },
+    { max:250, bg:'var(--sig-unhealthy-bg)',  text:'var(--sig-unhealthy-text)',  solid:'var(--sig-unhealthy-solid)',  label:'나쁨' },
+    { max:500, bg:'var(--sig-vunhealthy-bg)', text:'var(--sig-vunhealthy-text)', solid:'var(--sig-vunhealthy-solid)', label:'매우나쁨' }
+  ];
+  function gradeOf(v) { return KHAI_BANDS.find(b => v <= b.max) || KHAI_BANDS[KHAI_BANDS.length-1]; }
+
+  // =============== Vanilla SVG sparkline ===============
+  function sparkSVG(elId, values, colorVar) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const W = 100, H = 28, P = 2;
+    const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
+    const stepX = (W - P*2) / (values.length - 1);
+    const pts = values.map((v,i) => ({
+      x: P + i*stepX,
+      y: P + (1 - (v - min)/range) * (H - P*2)
+    }));
+    const linePath = 'M ' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L ');
+    const areaPath = linePath + ` L ${pts[pts.length-1].x.toFixed(1)},${H} L ${pts[0].x.toFixed(1)},${H} Z`;
+    const lastX = pts[pts.length-1].x, lastY = pts[pts.length-1].y;
+    const gradId = 'grad-'+elId;
+    el.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="w-full h-full" aria-hidden="true">
+        <defs>
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="${colorVar}" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="${colorVar}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="${areaPath}" fill="url(#${gradId})"/>
+        <path d="${linePath}" fill="none" stroke="${colorVar}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${lastX}" cy="${lastY}" r="1.6" fill="${colorVar}"/>
+      </svg>`;
+  }
+
+  // =============== Build station rows ===============
+  function buildStations() {
+    const tbody = document.getElementById('stationRows');
+    const sorted = [...STATIONS].sort((a,b) => b.khai - a.khai);
+    const maxKhai = Math.max(...sorted.map(s => s.khai));
+    const frag = document.createDocumentFragment();
+    sorted.forEach(s => {
+      const g = gradeOf(s.khai);
+      const tr = document.createElement('tr');
+      tr.className = 'data-row hover:bg-[var(--bg-elevated)]/60 transition-colors';
+      const widthPct = Math.max(8, (s.khai / maxKhai) * 100);
+      tr.innerHTML = `
+        <td class="px-4 py-2.5 font-medium">${s.name}</td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-[var(--text-secondary)]">${s.distance.toFixed(1)}</td>
+        <td class="px-4 py-2.5 text-right tabular-nums font-medium">${s.khai}</td>
+        <td class="px-4 py-2.5 text-right tabular-nums text-[var(--text-secondary)]">${s.pm25}</td>
+        <td class="px-4 py-2.5">
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                style="background:${g.bg}; color:${g.text};">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:${g.solid};"></span>
+            ${g.label}
+          </span>
+        </td>
+        <td class="px-4 py-2.5 hidden sm:table-cell">
+          <div class="relative w-full h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+            <div class="absolute inset-y-0 left-0 rounded-full" style="width:${widthPct.toFixed(1)}%; background:${g.solid};"></div>
+          </div>
+        </td>`;
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+
+  // =============== Update KHAI gauge arc ===============
+  function paintKhaiGauge() {
+    const value = NOW.khai;
+    const max = 500;
+    const circumference = 2 * Math.PI * 50;
+    const filled = (value / max) * circumference;
+    requestAnimationFrame(() => {
+      document.getElementById('khaiArc').setAttribute('stroke-dasharray', `${filled.toFixed(2)} ${circumference.toFixed(2)}`);
+    });
+  }
+
+  // =============== ApexCharts combo (24h) ===============
+  let combo;
+  function buildCombo() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isDark = document.documentElement.classList.contains('dark');
+    const opts = {
+      chart: {
+        type: 'line',
+        height: '100%',
+        background: 'transparent',
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        fontFamily: '"Pretendard Variable", sans-serif',
+        animations: { enabled: !reduceMotion, speed: 400 },
+        parentHeightOffset: 0,
+      },
+      series: [
+        { name:'PM2.5', type:'area', data: AQI_24H.map(d => d.pm25) },
+        { name:'PM10',  type:'line', data: AQI_24H.map(d => d.pm10) },
+        { name:'O3×100',type:'line', data: AQI_24H.map(d => +(d.o3*1000).toFixed(1)) },
+        { name:'NO2×100',type:'line',data: AQI_24H.map(d => +(d.no2*1000).toFixed(1)) }
+      ],
+      colors: ['#0ea5e9','#f59e0b','#f97316','#10b981'],
+      stroke: { curve:'smooth', width:[2,2,1.6,1.6], dashArray:[0,0,3,3] },
+      fill: {
+        type:['gradient','solid','solid','solid'],
+        gradient: { shadeIntensity:1, opacityFrom:0.32, opacityTo:0.02, stops:[0,100] }
+      },
+      dataLabels:{ enabled:false },
+      markers:{ size:0, hover:{size:4} },
+      legend:{ show:false },
+      grid:{
+        borderColor: isDark ? 'rgba(148,163,184,.18)' : 'rgba(15,23,42,.08)',
+        strokeDashArray: 3,
+        padding:{ left:4, right:12, top:0, bottom:0 }
+      },
+      xaxis:{
+        categories: AQI_24H.map(d => d.hour),
+        tickAmount: 8,
+        labels:{ style:{ colors: isDark?'#94a3b8':'#64748b', fontSize:'10px' }, formatter:v => `${v}시` },
+        axisBorder:{ show:false }, axisTicks:{ show:false },
+        crosshairs:{ stroke:{ color: isDark?'rgba(148,163,184,.35)':'rgba(15,23,42,.18)', dashArray:3 } }
+      },
+      yaxis: [
+        { title:{ text:'PM ㎍/㎥', style:{ color: isDark?'#94a3b8':'#64748b', fontSize:'10px', fontWeight:400 } },
+          labels:{ style:{ colors: isDark?'#94a3b8':'#64748b', fontSize:'10px' } } },
+        { show:false },
+        { opposite:true,
+          title:{ text:'O3·NO2 (×0.001 ppm)', style:{ color: isDark?'#94a3b8':'#64748b', fontSize:'10px', fontWeight:400 } },
+          labels:{ style:{ colors: isDark?'#94a3b8':'#64748b', fontSize:'10px' } } },
+        { show:false }
+      ],
+      tooltip:{
+        theme: isDark ? 'dark' : 'light',
+        shared:true, intersect:false,
+        x:{ formatter:(v,o) => `${AQI_24H[o.dataPointIndex].hour}시` },
+        y:{
+          formatter: function(val, opts) {
+            const i = opts.seriesIndex;
+            if (i === 0 || i === 1) return val + ' ㎍/㎥';
+            return (val/1000).toFixed(3) + ' ppm';
+          }
+        }
+      },
+      annotations:{
+        yaxis:[
+          { y:35, borderColor:'#f97316', strokeDashArray:4, label:{ text:'PM2.5 나쁨 시작 (35)', position:'right',
+            style:{ color:'#fff', background:'#f97316', fontSize:'10px' } } }
+        ]
+      },
+      responsive:[
+        { breakpoint:640, options:{ xaxis:{ tickAmount:4 }, yaxis:[{labels:{show:true}},{show:false},{show:false},{show:false}] } }
+      ]
+    };
+    combo = new ApexCharts(document.getElementById('trendCombo'), opts);
+    combo.render();
+  }
+
+  // =============== Theme toggle ===============
+  function applyTheme(t) {
+    const root = document.documentElement;
+    if (t === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
+    root.dataset.theme = t;
+    try { localStorage.setItem('w-theme', t); } catch(e) {}
+    if (combo) {
+      const isDark = t === 'dark';
+      combo.updateOptions({
+        tooltip:{ theme: isDark ? 'dark' : 'light' },
+        grid:{ borderColor: isDark ? 'rgba(148,163,184,.18)' : 'rgba(15,23,42,.08)' },
+        xaxis:{ labels:{ style:{ colors: isDark?'#94a3b8':'#64748b' } } },
+        yaxis:[
+          { labels:{ style:{ colors: isDark?'#94a3b8':'#64748b' } }, title:{ style:{ color: isDark?'#94a3b8':'#64748b' } } },
+          {}, { labels:{ style:{ colors: isDark?'#94a3b8':'#64748b' } }, title:{ style:{ color: isDark?'#94a3b8':'#64748b' } } }, {}
+        ]
+      }, false, false);
+    }
+    // Repaint vanilla sparklines (CSS vars resolved via stroke=var)
+    paintSparklines();
+  }
+  function initTheme() {
+    let t;
+    try { t = localStorage.getItem('w-theme'); } catch(e){}
+    if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    applyTheme(t);
+  }
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+  });
+
+  // =============== Init ===============
+  function paintSparklines() {
+    sparkSVG('spkPm25', AQI_24H.map(d=>d.pm25), 'var(--sig-moderate-solid)');
+    sparkSVG('spkPm10', AQI_24H.map(d=>d.pm10), 'var(--sig-caution-solid)');
+    sparkSVG('spkO3',   AQI_24H.map(d=>d.o3*1000), 'var(--sig-unhealthy-solid)');
+    sparkSVG('spkNo2',  AQI_24H.map(d=>d.no2*1000), 'var(--sig-good-solid)');
+  }
+
+  initTheme();
+  paintKhaiGauge();
+  paintSparklines();
+  buildStations();
+  buildCombo();
+</script>
+</body>
+</html>

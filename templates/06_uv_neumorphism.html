@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>자외선 지수 · 서울 · UV</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: { fontFamily: { sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'] } } },
+  };
+</script>
+<style>
+  :root {
+    --bg: #e6e9ef;
+    --bg-darker: #d8dde6;
+    --shadow-light: #ffffff;
+    --shadow-dark: #b9bdc6;
+    --text-primary: #2a3142;
+    --text-secondary: #5a6376;
+    --text-tertiary: #6b7488;
+    --uv-low: #22c55e;
+    --uv-moderate: #eab308;
+    --uv-high: #f97316;
+    --uv-very-high: #dc2626;
+    --uv-extreme: #7e22ce;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Pretendard Variable', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* 뉴모피즘 베이스 */
+  .neu-out {
+    background: var(--bg);
+    border-radius: 28px;
+    box-shadow:
+      18px 18px 36px var(--shadow-dark),
+      -18px -18px 36px var(--shadow-light);
+  }
+  .neu-out-sm {
+    background: var(--bg);
+    border-radius: 18px;
+    box-shadow:
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+  }
+  .neu-in {
+    background: var(--bg);
+    border-radius: 9999px;
+    box-shadow:
+      inset 6px 6px 12px var(--shadow-dark),
+      inset -6px -6px 12px var(--shadow-light);
+  }
+  .neu-in-sm {
+    background: var(--bg);
+    border-radius: 14px;
+    box-shadow:
+      inset 4px 4px 8px var(--shadow-dark),
+      inset -4px -4px 8px var(--shadow-light);
+  }
+  .neu-pill {
+    background: var(--bg);
+    border-radius: 9999px;
+    box-shadow:
+      inset 3px 3px 6px var(--shadow-dark),
+      inset -3px -3px 6px var(--shadow-light);
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(249, 115, 22, 0.45),
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+    border-radius: 18px;
+  }
+
+  /* 게이지 진행 애니메이션 */
+  .gauge-arc {
+    transition: stroke-dasharray 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gauge-pulse {
+    animation: gaugePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes gaugePulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.85; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* uv scale 그라데이션 */
+  .uv-scale {
+    background: linear-gradient(to right,
+      var(--uv-low) 0%, var(--uv-low) 18%,
+      var(--uv-moderate) 18%, var(--uv-moderate) 45%,
+      var(--uv-high) 45%, var(--uv-high) 64%,
+      var(--uv-very-high) 64%, var(--uv-very-high) 91%,
+      var(--uv-extreme) 91%, var(--uv-extreme) 100%);
+  }
+</style>
+</head>
+<body class="antialiased">
+  <main class="min-h-screen flex items-center justify-center p-5 sm:p-8" role="main">
+    <div class="w-full max-w-md mx-auto">
+
+      <!-- 메인 카드 -->
+      <article class="neu-out p-6 sm:p-8" aria-labelledby="uv-heading">
+
+        <!-- 헤더 -->
+        <header class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-2">
+            <span class="neu-pill px-3 py-1 text-[11px] uppercase tracking-widest text-[var(--text-tertiary)]">
+              UV INDEX
+            </span>
+          </div>
+          <p class="num text-[11px] text-[var(--text-tertiary)]">
+            서울 · 15:24
+          </p>
+        </header>
+
+        <h1 id="uv-heading" class="text-lg font-semibold text-[var(--text-secondary)] mb-2 text-center">
+          현재 자외선 지수
+        </h1>
+
+        <!-- 게이지 (반원) -->
+        <div class="relative mx-auto" style="width: 240px; height: 144px;">
+          <!-- 트랙 -->
+          <svg viewBox="0 0 240 140" class="absolute inset-0 w-full h-full"
+               role="meter" aria-valuenow="6" aria-valuemin="0" aria-valuemax="11"
+               aria-label="UV 지수 6 높음, 정오 최대 9 매우 높음">
+            <title>UV 지수 6 — 높음</title>
+            <!-- 음각 트랙 (회색 배경 호) -->
+            <path d="M 26,120 A 94,94 0 0 1 214,120"
+                  fill="none" stroke="var(--shadow-dark)" stroke-width="20"
+                  stroke-linecap="round" opacity="0.18"/>
+            <path d="M 26,120 A 94,94 0 0 1 214,120"
+                  fill="none" stroke="var(--shadow-light)" stroke-width="14"
+                  stroke-linecap="round" opacity="0.6"/>
+            <!-- 진행 호: UV 6 / 11 = 54.5% → dasharray = 295.31 * 0.545 ≈ 161 / 295.31 -->
+            <!-- 반원 둘레: π * r = 3.14159 * 94 ≈ 295.31 -->
+            <path class="gauge-arc" d="M 26,120 A 94,94 0 0 1 214,120"
+                  fill="none" stroke="var(--uv-high)" stroke-width="14"
+                  stroke-linecap="round"
+                  stroke-dasharray="161 295.31"/>
+            <!-- 진행 끝 인디케이터 점 -->
+            <!-- UV6 위치: 각도 = 180° - (6/11)*180° = 81.8°, x = 120 + 94*cos(81.8°), y = 120 - 94*sin(81.8°) -->
+            <circle cx="133.4" cy="26.93" r="9" fill="var(--bg)"
+                    stroke="var(--uv-high)" stroke-width="3"/>
+            <circle cx="133.4" cy="26.93" r="4" fill="var(--uv-high)" class="gauge-pulse"/>
+          </svg>
+
+          <!-- 중앙 숫자 (호 내부) -->
+          <div class="absolute inset-x-0 bottom-2 flex flex-col items-center">
+            <p class="num text-7xl font-extralight text-[var(--text-primary)] leading-none"
+               style="letter-spacing:-0.02em;">6</p>
+            <p class="text-[11px] uppercase tracking-widest text-[var(--text-tertiary)] mt-1">/ 11</p>
+          </div>
+        </div>
+
+        <!-- 등급 라벨 + 권장행동 -->
+        <div class="text-center mt-4">
+          <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold"
+                style="background: rgba(249, 115, 22, 0.12); color: #9a3412;">
+            <span class="w-2 h-2 rounded-full" style="background: var(--uv-high)"></span>
+            높음
+          </span>
+          <p class="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
+            선크림(SPF 30+) + 모자<br/>
+            <span class="text-[var(--text-tertiary)] text-xs">11~15시 외출 자제 권장</span>
+          </p>
+        </div>
+
+        <!-- UV Scale (HeatBar) -->
+        <section class="mt-6" aria-labelledby="scale-heading">
+          <div class="flex items-baseline justify-between mb-2">
+            <h2 id="scale-heading" class="text-xs uppercase tracking-wider text-[var(--text-tertiary)]">
+              WHO 5단계 척도
+            </h2>
+            <span class="num text-[10px] text-[var(--text-tertiary)]">UV 6 = 54.5%</span>
+          </div>
+          <div class="neu-in-sm p-2.5">
+            <div class="relative h-3.5 rounded-full overflow-hidden uv-scale"
+                 role="img" aria-label="UV 척도 0부터 11까지, 현재 위치 6">
+              <!-- 마커 -->
+              <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white shadow-md ring-2 ring-slate-700/30"
+                   style="left: 54.5%; transform: translate(-50%, -50%);"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-[var(--text-tertiary)] num mt-1.5 px-0.5">
+              <span>0<br><span class="text-[9px]">낮음</span></span>
+              <span>3<br><span class="text-[9px]">보통</span></span>
+              <span>6<br><span class="text-[9px]">높음</span></span>
+              <span>8<br><span class="text-[9px]">매우높음</span></span>
+              <span>11+<br><span class="text-[9px]">위험</span></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 화상시간 + 피크 카드 2 -->
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <div class="neu-out-sm p-4 text-center" role="group" aria-label="피부 화상까지 25분 (피부 타입 II)">
+            <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">화상시간</p>
+            <p class="num text-2xl font-light text-[var(--text-primary)] mt-1">
+              25<span class="text-sm text-[var(--text-tertiary)] ml-0.5">분</span>
+            </p>
+            <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">피부 타입 II</p>
+          </div>
+          <div class="neu-out-sm p-4 text-center" role="group" aria-label="오늘 최고 UV 9, 12시 30분">
+            <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">오늘 피크</p>
+            <p class="num text-2xl font-light mt-1" style="color: var(--uv-very-high)">
+              9<span class="text-sm text-[var(--text-tertiary)] ml-0.5">/ 12:30</span>
+            </p>
+            <p class="text-[10px] text-[var(--text-tertiary)] mt-0.5">매우높음</p>
+          </div>
+        </div>
+
+        <!-- SunArc 미니 (시간별) -->
+        <section class="mt-6" aria-labelledby="arc-heading">
+          <div class="flex items-baseline justify-between mb-2">
+            <h2 id="arc-heading" class="text-xs uppercase tracking-wider text-[var(--text-tertiary)]">
+              일출 ~ 일몰 · UV 시간 분포
+            </h2>
+          </div>
+          <div class="neu-in-sm p-3 pb-2">
+            <svg viewBox="0 0 320 110" class="w-full h-auto block"
+                 aria-label="태양 호: 일출 05:38, 일몰 19:24, 현재 71퍼센트 진행">
+              <title>태양 호 — 현재 시각 15:24, 일출~일몰 71% 진행</title>
+              <defs>
+                <linearGradient id="sky-grad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stop-color="#fda4af"/>
+                  <stop offset="35%"  stop-color="#fde68a"/>
+                  <stop offset="65%"  stop-color="#7dd3fc"/>
+                  <stop offset="100%" stop-color="#a78bfa"/>
+                </linearGradient>
+              </defs>
+              <!-- 호 (반지름 200, 중심 y=237.83 → 시각적으로 부드러운 호) -->
+              <path d="M 20,95 A 200,200 0 0 1 300,95"
+                    fill="none" stroke="url(#sky-grad)" stroke-width="3" opacity="0.9"/>
+              <!-- 지평선 -->
+              <line x1="0" y1="95" x2="320" y2="95"
+                    stroke="var(--shadow-dark)" stroke-width="1" opacity="0.4"/>
+              <!-- 시간 눈금 -->
+              <g font-size="9" fill="var(--text-tertiary)" font-family="inherit">
+                <text x="20" y="108" text-anchor="start" class="num">05:38</text>
+                <text x="160" y="108" text-anchor="middle" class="num">12:31</text>
+                <text x="300" y="108" text-anchor="end" class="num">19:24</text>
+              </g>
+              <!-- 현재 태양: progress 71.2% → 호 위 좌표 (224.6, 48.6) -->
+              <circle cx="224.6" cy="48.6" r="14" fill="var(--uv-high)" opacity="0.25"/>
+              <circle cx="224.6" cy="48.6" r="9"  fill="var(--uv-high)"/>
+              <circle cx="224.6" cy="48.6" r="4"  fill="#fff"/>
+            </svg>
+          </div>
+        </section>
+
+        <!-- 푸터 -->
+        <footer class="mt-5 flex items-center justify-between text-[10px] text-[var(--text-tertiary)]">
+          <span>WHO Global Solar UV Index</span>
+          <span class="num">2026.05.06</span>
+        </footer>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

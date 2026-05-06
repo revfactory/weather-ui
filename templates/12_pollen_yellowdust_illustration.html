@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>꽃가루 · 황사 · 알레르겐 — Illustration</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {
+      fontFamily: {
+        sans: ['"Pretendard Variable"','Pretendard','-apple-system','system-ui','sans-serif'],
+      }
+    } }
+  };
+</script>
+<style>
+  :root {
+    --bg-base:#fffaf0;
+    --bg-card:#ffffff;
+    --text-primary:#3f2f1d;
+    --text-secondary:#6b5c44;
+    --text-tertiary:#a08c6c;
+    --border:#f0e4cc;
+    --focus-ring:#c2410c;
+
+    --sig-good-bg:#dcfce7;        --sig-good-text:#14532d;        --sig-good-solid:#22c55e;
+    --sig-moderate-bg:#dbeafe;    --sig-moderate-text:#1e3a8a;    --sig-moderate-solid:#3b82f6;
+    --sig-caution-bg:#fef3c7;     --sig-caution-text:#78350f;     --sig-caution-solid:#f59e0b;
+    --sig-unhealthy-bg:#ffedd5;   --sig-unhealthy-text:#7c2d12;   --sig-unhealthy-solid:#f97316;
+    --sig-vunhealthy-bg:#fee2e2;  --sig-vunhealthy-text:#7f1d1d;  --sig-vunhealthy-solid:#ef4444;
+
+    --w-yellowdust:#92400e;
+  }
+  body {
+    font-family: "Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 10%, rgba(254,240,138,.6), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 95% 5%, rgba(253,224,71,.45), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 110%, rgba(254,215,170,.55), transparent 60%),
+      linear-gradient(180deg, #fef3c7 0%, #fffbeb 35%, #fff7ed 100%);
+    min-height: 100vh;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: 0 18px 40px -22px rgba(146,64,14,.25), 0 1px 0 rgba(255,255,255,.6) inset;
+  }
+  .float-slow { animation: floatSlow 6s ease-in-out infinite; }
+  .float-mid  { animation: floatSlow 4.5s ease-in-out infinite; }
+  .float-fast { animation: floatSlow 3.6s ease-in-out infinite; }
+  @keyframes floatSlow {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .spin-slow { animation: spin 22s linear infinite; transform-origin: center; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pulse-ring { animation: pulseRing 2.4s ease-out infinite; transform-origin: center; }
+  @keyframes pulseRing {
+    0% { transform: scale(0.95); opacity: 0.55; }
+    80%,100% { transform: scale(1.5); opacity: 0; }
+  }
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 16px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,*::before,*::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+  <!-- Header -->
+  <header class="flex items-end justify-between mb-5 sm:mb-7 gap-3 flex-wrap">
+    <div>
+      <p class="text-[11px] sm:text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">계절 알레르겐 보고서</p>
+      <h1 class="mt-1 text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+        오늘의 꽃가루 · 황사
+      </h1>
+      <p class="mt-1 text-sm text-[var(--text-secondary)] tabular-nums">
+        서울 · 2026-05-06 (수) 15:24 KST · 초여름
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+            style="background:var(--sig-vunhealthy-bg); color:var(--sig-vunhealthy-text);">
+        <svg viewBox="0 0 16 16" class="w-3.5 h-3.5" aria-hidden="true">
+          <path fill="currentColor" d="M8 1l7 13H1L8 1zm0 4.6L4.4 12h7.2L8 5.6zm-.8 2.2h1.6V10H7.2V7.8zm0 2.7h1.6V12H7.2v-1.5z"/>
+        </svg>
+        주의단계
+      </span>
+    </div>
+  </header>
+
+  <!-- Hero card -->
+  <section class="card p-6 sm:p-8 mb-5 sm:mb-7" aria-label="오늘의 꽃가루 캐릭터 및 종합 판단">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
+
+      <!-- Character SVG -->
+      <div class="flex justify-center">
+        <svg viewBox="0 0 320 280" class="w-full max-w-[320px] h-auto" role="img"
+             aria-label="꽃가루와 황사가 떠다니는 풍경 일러스트">
+          <defs>
+            <radialGradient id="sunGrad" cx="0.4" cy="0.4" r="0.7">
+              <stop offset="0%" stop-color="#fef3c7"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </radialGradient>
+            <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#86efac"/>
+              <stop offset="100%" stop-color="#22c55e"/>
+            </linearGradient>
+            <linearGradient id="dustHaze" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fde68a" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.05"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Sky haze (yellow dust) -->
+          <rect x="0" y="0" width="320" height="200" fill="url(#dustHaze)"/>
+
+          <!-- Sun with pulse -->
+          <g transform="translate(255 65)">
+            <circle r="40" fill="#fde68a" opacity="0.35" class="pulse-ring"/>
+            <circle r="28" fill="url(#sunGrad)"/>
+            <g class="spin-slow" stroke="#f59e0b" stroke-width="2.4" stroke-linecap="round" opacity="0.7">
+              <line x1="0" y1="-38" x2="0" y2="-44"/>
+              <line x1="0" y1="38" x2="0" y2="44"/>
+              <line x1="-38" y1="0" x2="-44" y2="0"/>
+              <line x1="38" y1="0" x2="44" y2="0"/>
+              <line x1="-27" y1="-27" x2="-32" y2="-32"/>
+              <line x1="27" y1="-27" x2="32" y2="-32"/>
+              <line x1="-27" y1="27" x2="-32" y2="32"/>
+              <line x1="27" y1="27" x2="32" y2="32"/>
+            </g>
+          </g>
+
+          <!-- Dust particles (yellow) drifting -->
+          <g fill="#a16207" opacity="0.55">
+            <circle cx="40" cy="48" r="2.4" class="float-slow"/>
+            <circle cx="90" cy="35" r="1.8" class="float-mid"/>
+            <circle cx="160" cy="50" r="2" class="float-fast"/>
+            <circle cx="200" cy="80" r="1.6" class="float-slow"/>
+            <circle cx="115" cy="95" r="2.2" class="float-mid"/>
+            <circle cx="60" cy="100" r="1.6" class="float-fast"/>
+            <circle cx="240" cy="120" r="2" class="float-slow"/>
+          </g>
+
+          <!-- Hills -->
+          <path d="M 0 200 Q 60 160 130 178 T 320 175 L 320 280 L 0 280 Z" fill="url(#hill)"/>
+          <path d="M 0 230 Q 80 200 170 215 T 320 220 L 320 280 L 0 280 Z" fill="#16a34a" opacity="0.85"/>
+
+          <!-- Trees (oak + pine icon) -->
+          <g transform="translate(50 188)" aria-hidden="true">
+            <!-- oak -->
+            <ellipse cx="0" cy="-22" rx="22" ry="20" fill="#15803d"/>
+            <ellipse cx="-12" cy="-12" rx="14" ry="11" fill="#16a34a"/>
+            <ellipse cx="14" cy="-14" rx="13" ry="11" fill="#16a34a"/>
+            <rect x="-3" y="-4" width="6" height="20" fill="#7c2d12" rx="1"/>
+          </g>
+          <g transform="translate(245 200)" aria-hidden="true">
+            <!-- pine -->
+            <polygon points="0,-40 -16,-12 16,-12" fill="#166534"/>
+            <polygon points="0,-22 -20,8 20,8" fill="#15803d"/>
+            <rect x="-3" y="6" width="6" height="14" fill="#7c2d12" rx="1"/>
+          </g>
+
+          <!-- Pollen "characters" floating -->
+          <g class="float-mid">
+            <g transform="translate(105 130)">
+              <!-- pollen orb (oak) -->
+              <circle r="22" fill="#fde047" stroke="#ca8a04" stroke-width="1.6"/>
+              <g stroke="#ca8a04" stroke-width="1.5" stroke-linecap="round">
+                <line x1="0" y1="-22" x2="0" y2="-30"/>
+                <line x1="0" y1="22" x2="0" y2="30"/>
+                <line x1="-22" y1="0" x2="-30" y2="0"/>
+                <line x1="22" y1="0" x2="30" y2="0"/>
+                <line x1="-15" y1="-15" x2="-21" y2="-21"/>
+                <line x1="15" y1="-15" x2="21" y2="-21"/>
+                <line x1="-15" y1="15" x2="-21" y2="21"/>
+                <line x1="15" y1="15" x2="21" y2="21"/>
+              </g>
+              <!-- face -->
+              <circle cx="-6" cy="-3" r="1.8" fill="#3f2f1d"/>
+              <circle cx="6" cy="-3" r="1.8" fill="#3f2f1d"/>
+              <path d="M -6 7 Q 0 11 6 7" stroke="#3f2f1d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+          <g class="float-fast">
+            <g transform="translate(180 145)">
+              <circle r="16" fill="#fdba74" stroke="#c2410c" stroke-width="1.6"/>
+              <g stroke="#c2410c" stroke-width="1.4" stroke-linecap="round">
+                <line x1="0" y1="-16" x2="0" y2="-22"/>
+                <line x1="0" y1="16" x2="0" y2="22"/>
+                <line x1="-16" y1="0" x2="-22" y2="0"/>
+                <line x1="16" y1="0" x2="22" y2="0"/>
+              </g>
+              <circle cx="-4" cy="-2" r="1.4" fill="#3f2f1d"/>
+              <circle cx="4" cy="-2" r="1.4" fill="#3f2f1d"/>
+              <path d="M -4 5 Q 0 8 4 5" stroke="#3f2f1d" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+          <g class="float-slow">
+            <g transform="translate(60 155)">
+              <circle r="13" fill="#bef264" stroke="#4d7c0f" stroke-width="1.4"/>
+              <g stroke="#4d7c0f" stroke-width="1.2" stroke-linecap="round">
+                <line x1="0" y1="-13" x2="0" y2="-18"/>
+                <line x1="0" y1="13" x2="0" y2="18"/>
+                <line x1="-13" y1="0" x2="-18" y2="0"/>
+                <line x1="13" y1="0" x2="18" y2="0"/>
+              </g>
+              <circle cx="-3" cy="-1" r="1.2" fill="#3f2f1d"/>
+              <circle cx="3" cy="-1" r="1.2" fill="#3f2f1d"/>
+              <path d="M -3 4 Q 0 6 3 4" stroke="#3f2f1d" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Insight -->
+      <div>
+        <p class="text-[11px] uppercase tracking-widest text-[var(--text-tertiary)]">종합 판단</p>
+        <p class="mt-2 text-2xl sm:text-3xl font-bold text-[var(--text-primary)] leading-snug">
+          소나무 꽃가루 <span class="text-[var(--sig-vunhealthy-text)]">매우나쁨</span>
+        </p>
+        <p class="mt-2 text-base text-[var(--text-secondary)]">
+          민감군은 외출을 자제하세요. 외출 시 <span class="font-semibold">KF94 마스크</span>와 안경 착용을 권장합니다.
+        </p>
+
+        <ul class="mt-4 space-y-2 text-sm">
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[var(--sig-good-solid)] shrink-0"></span>
+            <span>외출 권장 시간대: <span class="tabular-nums font-medium">06:00 ~ 09:00</span> (이른 아침)</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[var(--sig-vunhealthy-solid)] shrink-0"></span>
+            <span>비추천: <span class="tabular-nums font-medium">11:00 ~ 16:00</span> (소나무 정점)</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[var(--sig-caution-solid)] shrink-0"></span>
+            <span>황사 PM<sub>10</sub>: <span class="tabular-nums font-medium">145 ㎍/㎥</span> (나쁨)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Allergen chips -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-5 sm:mb-7" aria-label="알레르겐 종류별 등급">
+    <!-- Oak -->
+    <article class="card p-5 relative overflow-hidden" role="group" aria-label="참나무 꽃가루">
+      <div class="absolute -top-6 -right-6 w-20 h-20 rounded-full" style="background:var(--sig-unhealthy-bg);"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between">
+          <p class="text-xs uppercase tracking-widest text-[var(--text-tertiary)]">참나무 (Oak)</p>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                style="background:var(--sig-unhealthy-bg); color:var(--sig-unhealthy-text);">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:var(--sig-unhealthy-solid);"></span>
+            나쁨
+          </span>
+        </div>
+        <p class="mt-3 text-4xl font-light tabular-nums">220<span class="text-sm text-[var(--text-tertiary)] ml-1.5 font-normal">입자/㎥</span></p>
+        <p class="mt-1 text-xs text-[var(--text-tertiary)]">기준 200~499 → 나쁨</p>
+
+        <!-- 7d sparkline -->
+        <div class="mt-4">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1">7일 추이</p>
+          <svg id="sparkOak" viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-10"
+               role="img" aria-label="참나무 꽃가루 7일 추이, 5월 1일 80에서 5월 7일 240까지 상승"></svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- Pine (highlight) -->
+    <article class="card p-5 relative overflow-hidden ring-2 ring-[var(--sig-vunhealthy-solid)] ring-opacity-40" role="group" aria-label="소나무 꽃가루">
+      <div class="absolute -top-6 -right-6 w-20 h-20 rounded-full" style="background:var(--sig-vunhealthy-bg);"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between">
+          <p class="text-xs uppercase tracking-widest text-[var(--text-tertiary)]">소나무 (Pine)</p>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                style="background:var(--sig-vunhealthy-bg); color:var(--sig-vunhealthy-text);">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:var(--sig-vunhealthy-solid);"></span>
+            매우나쁨
+          </span>
+        </div>
+        <p class="mt-3 text-4xl font-light tabular-nums">480<span class="text-sm text-[var(--text-tertiary)] ml-1.5 font-normal">입자/㎥</span></p>
+        <p class="mt-1 text-xs text-[var(--text-tertiary)]">기준 ≥400 → 매우나쁨</p>
+        <div class="mt-4">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1">7일 추이</p>
+          <svg id="sparkPine" viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-10"
+               role="img" aria-label="소나무 꽃가루 7일 추이, 5월 1일 180에서 5월 7일 520까지 급상승"></svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- Grass -->
+    <article class="card p-5 relative overflow-hidden" role="group" aria-label="잡초 꽃가루">
+      <div class="absolute -top-6 -right-6 w-20 h-20 rounded-full" style="background:var(--sig-good-bg);"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between">
+          <p class="text-xs uppercase tracking-widest text-[var(--text-tertiary)]">잡초 (Grass)</p>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                style="background:var(--sig-good-bg); color:var(--sig-good-text);">
+            <span class="w-1.5 h-1.5 rounded-full" style="background:var(--sig-good-solid);"></span>
+            좋음
+          </span>
+        </div>
+        <p class="mt-3 text-4xl font-light tabular-nums">25<span class="text-sm text-[var(--text-tertiary)] ml-1.5 font-normal">입자/㎥</span></p>
+        <p class="mt-1 text-xs text-[var(--text-tertiary)]">기준 &lt;30 → 좋음</p>
+        <div class="mt-4">
+          <p class="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] mb-1">7일 추이</p>
+          <svg id="sparkGrass" viewBox="0 0 100 30" preserveAspectRatio="none" class="w-full h-10"
+               role="img" aria-label="잡초 꽃가루 7일 추이, 12에서 28까지 점진 상승"></svg>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Yellow dust mini gauge + recommendation -->
+  <section class="card p-5 sm:p-7 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center" aria-label="황사 농도 및 권장 사항">
+
+    <!-- Mini gauge -->
+    <div class="text-center" aria-label="황사 농도 미니 게이지">
+      <p class="text-xs uppercase tracking-widest text-[var(--text-tertiary)]">황사 PM<sub>10</sub></p>
+      <div class="relative inline-block mt-2" style="width:140px;height:140px;">
+        <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90"
+             role="meter" aria-valuenow="145" aria-valuemin="0" aria-valuemax="800"
+             aria-label="황사 PM10 145 마이크로그램, 나쁨">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#fef3c7" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none"
+                  stroke="var(--sig-unhealthy-solid)" stroke-width="10"
+                  stroke-linecap="round"
+                  stroke-dasharray="56.94 314.16"
+                  style="transition: stroke-dasharray 600ms cubic-bezier(.4,0,.2,1);"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <p class="text-3xl font-light tabular-nums leading-none">145</p>
+          <p class="text-[10px] text-[var(--text-tertiary)] mt-1">㎍/㎥</p>
+        </div>
+      </div>
+      <p class="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
+         style="background:var(--sig-unhealthy-bg); color:var(--sig-unhealthy-text);">
+        <span class="w-1.5 h-1.5 rounded-full" style="background:var(--sig-unhealthy-solid);"></span>
+        나쁨
+      </p>
+      <p class="mt-1 text-[10px] text-[var(--text-tertiary)]">황사주의보 기준: 시간평균 ≥300</p>
+    </div>
+
+    <!-- Mask & action -->
+    <div class="lg:col-span-2">
+      <p class="text-[11px] uppercase tracking-widest text-[var(--text-tertiary)]">행동 권장</p>
+      <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="rounded-2xl p-4" style="background:#fef3c7;">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-white">
+              <svg viewBox="0 0 24 24" class="w-5 h-5 text-[#92400e]" aria-hidden="true">
+                <path fill="currentColor" d="M4 11c0-2 1.8-3.5 8-3.5s8 1.5 8 3.5v3c0 3-2.7 5.5-8 5.5s-8-2.5-8-5.5v-3z" opacity=".25"/>
+                <path fill="none" stroke="currentColor" stroke-width="1.6" d="M4 11c0-2 1.8-3.5 8-3.5s8 1.5 8 3.5v3c0 3-2.7 5.5-8 5.5s-8-2.5-8-5.5v-3z"/>
+                <path d="M2 11l2 .5M22 11l-2 .5M2 14l2 .5M22 14l-2 .5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <path d="M9 12.5h6M9 15h6" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="font-semibold text-[var(--text-primary)]">마스크 권장</p>
+          </div>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">
+            <span class="font-semibold text-[#92400e]">KF94</span> 이상 권장.
+            안경 착용 시 김서림 방지를.
+          </p>
+        </div>
+
+        <div class="rounded-2xl p-4" style="background:#fee2e2;">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-white">
+              <svg viewBox="0 0 24 24" class="w-5 h-5 text-[var(--sig-vunhealthy-text)]" aria-hidden="true">
+                <path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                      d="M12 4c-3 5-6 5-6 9a6 6 0 0 0 12 0c0-4-3-4-6-9z"/>
+                <path d="M12 14a3 3 0 0 0 3-3" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="font-semibold text-[var(--text-primary)]">민감군 주의</p>
+          </div>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">
+            천식·비염·결막염 환자는
+            <span class="font-semibold">실내 환기 자제</span> 권장.
+          </p>
+        </div>
+
+        <div class="rounded-2xl p-4 sm:col-span-2" style="background:#dcfce7;">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-white">
+              <svg viewBox="0 0 24 24" class="w-5 h-5 text-[var(--sig-good-text)]" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="font-semibold text-[var(--text-primary)]">외출 권장 시간대</p>
+            <span class="ml-auto text-base tabular-nums font-semibold text-[var(--sig-good-text)]">06:00 ~ 09:00</span>
+          </div>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">
+            기상청 농도 데이터 기준, 이른 아침 시간대가 알레르겐 농도가 가장 낮습니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-6 text-center text-[11px] text-[var(--text-tertiary)]">
+    출처: 기상청 꽃가루 농도 위험지수 · 환경부 에어코리아 PM<sub>10</sub> · UI=illustration
+  </footer>
+</main>
+
+<script>
+  // ============== 더미 데이터 (samples.json: pollen_yellowdust + pollen_7d_trend) ==============
+  // Note: 작업 설명에 따라 황사 PM10=145(나쁨)로 조정
+  const TREND = [
+    { date:"5/1", oak:80,  pine:180, grass:12 },
+    { date:"5/2", oak:110, pine:240, grass:14 },
+    { date:"5/3", oak:160, pine:320, grass:18 },
+    { date:"5/4", oak:195, pine:410, grass:22 },
+    { date:"5/5", oak:210, pine:460, grass:25 },
+    { date:"5/6", oak:220, pine:480, grass:25 },
+    { date:"5/7", oak:240, pine:520, grass:28 }
+  ];
+
+  function sparkSVG(elId, values, colorVar) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const W = 100, H = 30, P = 3;
+    const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
+    const stepX = (W - P*2) / (values.length - 1);
+    const pts = values.map((v,i) => ({
+      x: P + i*stepX,
+      y: P + (1 - (v - min)/range) * (H - P*2)
+    }));
+    const linePath = 'M ' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L ');
+    const areaPath = linePath + ` L ${pts[pts.length-1].x.toFixed(1)},${H} L ${pts[0].x.toFixed(1)},${H} Z`;
+    const lastIdx = pts.length - 1;
+    const grad = 'gradPo-'+elId;
+    el.innerHTML = `
+      <defs>
+        <linearGradient id="${grad}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${colorVar}" stop-opacity="0.42"/>
+          <stop offset="100%" stop-color="${colorVar}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaPath}" fill="url(#${grad})"/>
+      <path d="${linePath}" fill="none" stroke="${colorVar}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${pts[lastIdx].x}" cy="${pts[lastIdx].y}" r="2.4" fill="${colorVar}"/>
+      <circle cx="${pts[lastIdx].x}" cy="${pts[lastIdx].y}" r="4.2" fill="${colorVar}" fill-opacity="0.25"/>`;
+  }
+
+  sparkSVG('sparkOak',   TREND.map(d=>d.oak),   'var(--sig-unhealthy-solid)');
+  sparkSVG('sparkPine',  TREND.map(d=>d.pine),  'var(--sig-vunhealthy-solid)');
+  sparkSVG('sparkGrass', TREND.map(d=>d.grass), 'var(--sig-good-solid)');
+</script>
+</body>
+</html>
